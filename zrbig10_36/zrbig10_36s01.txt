@@ -1,0 +1,22 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_36S01
+*&---------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.
+PARAMETERS : p_bukrs TYPE bkpf-bukrs,
+             p_blart TYPE bkpf-blart,
+             p_budat TYPE bkpf-budat,  " Posting date
+             p_bktxt TYPE bkpf-bktxt,  " Header text
+             p_waers TYPE bkpf-waers.  " Currency
+
+PARAMETERS : p_mode  TYPE ctu_params-dismode.
+
+SELECTION-SCREEN END OF BLOCK pa1.
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE TEXT-t02.
+PARAMETERS : p_hkont1 TYPE ska1-saknr,  " Debot G/L account
+             p_hkont2 TYPE ska1-saknr,  " Credit G/L accout
+             p_dmbtr  TYPE bseg-dmbtr.  " Document amount
+SELECTION-SCREEN END OF BLOCK pa2.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

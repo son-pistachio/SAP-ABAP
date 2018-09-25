@@ -1,0 +1,25 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_17TOP                                     Report ZRBIG10_17
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_17.
+
+TABLES : scarr, sticket, scustom.
+
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+*       go_container TYPE REF TO cl_gui_custom_container.
+       go_container TYPE REF TO cl_gui_docking_container.
+
+DATA : gt_scarr   TYPE TABLE OF scarr,
+       gs_scarr   TYPE scarr,
+       gt_sticket TYPE TABLE OF sticket,
+       gs_sticket TYPE sticket,
+       gt_scustom TYPE TABLE OF scustom,
+       gs_scustom TYPE scustom.
+
+DATA : gs_layout  TYPE lvc_s_layo.
+
+DATA : gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

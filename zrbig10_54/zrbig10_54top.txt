@@ -1,0 +1,60 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_54TOP                                     Report ZRBIG10_54
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_54 MESSAGE-ID k5.
+
+TABLES reguh.
+
+DATA : BEGIN OF gs_body,
+         laufd TYPE reguh-laufd,
+         laufi TYPE reguh-laufi,
+         vblnr TYPE reguh-vblnr,
+         lifnr TYPE reguh-lifnr,
+         name1 TYPE lfa1-name1,
+         hktid TYPE reguh-hktid,
+         hbkid TYPE reguh-hbkid,
+         text1 TYPE t012t-text1,
+         rwbtr TYPE reguh-rwbtr,
+         waers TYPE reguh-waers,
+       END OF gs_body,
+
+       BEGIN OF gs_pop_body,
+         laufd TYPE regup-laufd,
+         laufi TYPE regup-laufi,
+         vblnr TYPE regup-vblnr,
+         lifnr TYPE regup-lifnr,
+         buzei TYPE regup-buzei,
+         dmbtr TYPE regup-dmbtr,
+       END OF gs_pop_body,
+
+       gs_lfa1  TYPE lfa1,
+       gs_reguh TYPE reguh,
+       gs_t012t TYPE t012t.
+
+DATA : gt_body     LIKE TABLE OF gs_body,
+       gt_pop_body LIKE TABLE OF gs_pop_body,
+       gt_reguh    LIKE TABLE OF gs_reguh,
+       gt_lfa1     LIKE TABLE OF gs_lfa1,
+       gt_t012t    LIKE TABLE OF gs_t012t.
+
+DATA : go_container TYPE REF TO cl_gui_docking_container,
+       go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+
+       go_pop_cont  TYPE REF TO cl_gui_custom_container,
+       go_pop_grid  TYPE REF TO cl_gui_alv_grid.
+
+DATA : gs_layout   TYPE lvc_s_layo,
+       gs_sort     TYPE lvc_s_sort,
+       gt_sort     LIKE TABLE OF gs_sort,
+       gs_fcat     TYPE lvc_s_fcat,
+       gt_fcat     TYPE lvc_t_fcat,
+
+       gs_pop_layo TYPE lvc_s_layo,
+       gs_pop_fcat TYPE lvc_s_fcat,
+       gt_pop_fcat TYPE lvc_t_fcat.
+
+DATA : gv_okcode TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

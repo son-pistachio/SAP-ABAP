@@ -1,0 +1,46 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_11
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_11top                           .    " global Data
+
+INCLUDE zrbig10_11s01                           .  " Selection Screen
+INCLUDE zrbig10_11f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+AT SELECTION-SCREEN.
+  PERFORM button_action.
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM modify_screen.
+
+*Text elements
+*----------------------------------------------------------
+* I01 Action
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BUKRS         Company
+* P_CHECK         Active
+* P_DAY         Today
+* P_GJAHR         Fiscal year
+* P_MONAT         Month
+* S_BUDAT         Posting date
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

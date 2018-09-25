@@ -1,0 +1,53 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_12
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_12top                           .    " global Data
+
+INCLUDE zrbig10_12s01                           .  " Selection Screen
+INCLUDE zrbig10_12o01                           .  " PBO-Modules
+INCLUDE zrbig10_12i01                           .  " PAI-Modules
+INCLUDE zrbig10_12f01                           .  " FORM-Routines
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+*  START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+  PERFORM get_airline_data.
+
+  IF gt_scarr IS NOT INITIAL.     " ###### internal table# #### ##.
+    CALL SCREEN 100.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> Airline master
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* S_CARRID         Airline
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

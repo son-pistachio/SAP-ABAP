@@ -1,0 +1,19 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_31S01
+*&---------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.
+PARAMETERS : p_carrid TYPE scarr-carrid,
+             p_connid TYPE spfli-connid,
+             p_fldate TYPE sflight-fldate,
+             p_bookid TYPE sbook-bookid.
+SELECTION-SCREEN END OF BLOCK pa1.
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE TEXT-t02.
+PARAMETERS : r_scarr   RADIOBUTTON GROUP rb1,
+             r_spfli   RADIOBUTTON GROUP rb1,
+             r_flight RADIOBUTTON GROUP rb1,
+             r_sbook   RADIOBUTTON GROUP rb1.
+SELECTION-SCREEN END OF BLOCK pa2.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

@@ -1,0 +1,43 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_10TOP                                     Report ZRBIG10_10
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRBIG10_10 MESSAGE-ID k5 LINE-SIZE 800.
+
+TABLES : scarr, spfli, sflight, sbook.
+
+DATA : BEGIN OF gs_airline,         " SCARR & SFLIGHT
+  carrid    TYPE scarr-carrid,
+  connid    TYPE sflight-connid,
+  carrname  TYPE scarr-carrname,
+  price     TYPE sflight-price,
+  planetype TYPE sflight-planetype,
+  url       TYPE scarr-url,
+  END OF gs_airline.
+
+DATA : gt_airline LIKE TABLE OF gs_airline.
+
+DATA : BEGIN OF gs_booking,         " SPFLI & SBOOK
+  carrid    TYPE spfli-carrid,
+  connid    TYPE spfli-connid,
+  cityfrom  TYPE spfli-cityfrom,
+  cityto    TYPE spfli-cityto,
+  customid  TYPE sbook-customid,
+  wunit     TYPE sbook-wunit,
+  END OF gs_booking.
+
+DATA : gt_booking LIKE TABLE OF gs_booking.
+
+*-- For all entries
+
+DATA : gt_scarr   TYPE TABLE OF scarr,
+       gs_scarr   TYPE scarr,
+       gt_spfli   TYPE TABLE OF spfli,
+       gs_spfli   TYPE spfli,
+       gt_sflight TYPE TABLE OF sflight,
+       gs_sflight TYPE sflight,
+       gt_sbook   TYPE TABLE OF sbook,
+       gs_sbook   TYPE sbook.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

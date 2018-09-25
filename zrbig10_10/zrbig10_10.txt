@@ -1,0 +1,48 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_10
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE ZRBIG10_10TOP                           .    " global Data
+
+ INCLUDE ZRBIG10_10S01                           .  " Selection Screen
+ INCLUDE ZRBIG10_10F01                           .  " FORM-Routines
+
+ INITIALIZATION.
+  PERFORM set_init_value.
+
+  START-OF-SELECTION.
+  CASE 'X'.
+    WHEN p_air.
+      PERFORM get_base_data.
+      PERFORM display_base_data.
+    WHEN p_book.
+      PERFORM get_booking_data.
+      PERFORM display_booking_data.
+  ENDCASE.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+* T02 Choice
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_AIR         SCARR & SFLIGHT
+* P_BOOK         SPFLI & SBOOK
+* P_CARRID         Airline
+* S_CONNID         Connection
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

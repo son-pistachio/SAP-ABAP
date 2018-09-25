@@ -1,0 +1,72 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_09
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE ZRBIG10_09TOP                           .    " global Data
+
+ INCLUDE ZRBIG10_09S01                           .  " Selection Screen
+ INCLUDE ZRBIG10_09F01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  CASE 'X'.
+    WHEN p_air.
+      PERFORM get_base_data.
+*      PERFORM display_base_data.
+    WHEN p_book.
+      PERFORM get_booking_data.
+*      PERFORM display_booking_data.
+    WHEN p_fair.      " SCARR & SPFLI For all entries in
+      PERFORM get_fair_data.
+*      PERFORM display_base_data.
+    WHEN p_fbook.     " SFIGHT & SBOOK For all entries in
+      PERFORM get_book_data.
+*      PERFORM display_booking_data.
+  ENDCASE.
+
+PERFORM value_sum USING 1 2 CHANGING gv_sum.
+
+READ TABLE gt_airline INTO gs_airline WITH KEY carrid = p_carrid         " EQ, BT.... # ####.
+                                               connid = s_connid-low.
+PERFORM display_scarr USING gs_airline-carrid gs_airline-connid.
+
+*-- Pass the internal table
+PERFORM display_airline TABLES gt_airline USING 1 2 CHANGING gv_sum.  " ### #### # ### #### ##.
+
+CLEAR scarr.
+SELECT SINGLE *
+  FROM scarr
+  WHERE carrid EQ p_carrid.
+" tables# ## ## ### work area# ### ### ### # ##.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+* T02 Choice
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_AIR         SCARR & SPFLI
+* P_BOOK         SFLIGHT & SBOOK
+* P_CARRID         Airline
+* P_FAIR         SCARR For all  SPELI
+* P_FBOOK         SFLIGHT For all SBOOK
+* S_CARRID         Airline
+* S_CONNID         Connection
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

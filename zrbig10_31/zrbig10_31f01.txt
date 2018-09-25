@@ -1,0 +1,162 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_31F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_carrid  = 'LH'.
+  p_connid  = 400.
+  p_fldate  = '20170423'.
+  p_bookid  = 51.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SCARR_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_scarr_data .
+
+  DATA : lv_subrc TYPE sy-subrc.
+
+*-- Get scarr data by call function
+  CLEAR gt_scarr.
+  CALL FUNCTION 'ZFM_SCARR_10'
+    EXPORTING
+      i_carrid = p_carrid
+    IMPORTING
+      e_subrc  = lv_subrc
+    TABLES
+      t_scarr  = gt_scarr.
+
+  IF lv_subrc EQ 0.
+
+    LOOP AT gt_scarr INTO gs_scarr.
+
+      WRITE :/ gs_scarr-carrid, gs_scarr-carrname.
+
+    ENDLOOP.
+
+  ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SPFLI_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_spfli_data .
+
+  DATA : lv_subrc TYPE sy-subrc.
+
+*-- Get flight schedule data
+  CLEAR gt_spfli.
+  CALL FUNCTION 'ZFM_SPFLI_10'
+    EXPORTING
+      i_carrid = p_carrid
+      i_connid = p_connid
+    IMPORTING
+      e_subrc  = lv_subrc
+    TABLES
+      t_spfli  = gt_spfli.
+
+  IF lv_subrc EQ 0.
+
+    LOOP AT gt_spfli INTO gs_spfli.
+
+      WRITE :/ gs_spfli-carrid, gs_spfli-connid, gs_spfli-cityfrom.
+
+    ENDLOOP.
+
+  ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SFLIGHT_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_sflight_data .
+
+  DATA : lv_subrc TYPE sy-subrc.
+
+*-- Get sflight data
+  CLEAR : gt_sflight.
+  CALL FUNCTION 'ZFM_SFLIGHT_10'
+    EXPORTING
+      i_carrid  = p_carrid
+      i_connid  = p_connid
+      i_fldate  = p_fldate
+    IMPORTING
+      e_subrc   = lv_subrc
+    TABLES
+      t_sflight = gt_sflight.
+
+  IF lv_subrc EQ 0.
+
+    LOOP AT gt_sflight INTO gs_sflight.
+
+      WRITE :/ gs_sflight-carrid, gs_sflight-connid, gs_sflight-fldate.
+
+    ENDLOOP.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SBOOK_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_sbook_data .
+
+  DATA : lv_subrc TYPE sy-subrc.
+
+*-- Get Sbook data
+  CLEAR : gt_sbook.
+  CALL FUNCTION 'ZFM_SBOOK_10'
+    EXPORTING
+      i_carrid = p_carrid
+      i_connid = p_connid
+      i_fldate = p_fldate
+      i_bookid = p_bookid
+    IMPORTING
+      e_subrc  = lv_subrc
+    TABLES
+      t_sbook  = gt_sbook.
+
+  IF lv_subrc EQ 0.
+    LOOP AT gt_sbook INTO gs_sbook.
+
+      WRITE :/ gs_sbook-carrid, gs_sbook-connid,
+               gs_sbook-fldate, gs_sbook-bookid.
+
+    ENDLOOP.
+
+  ENDIF.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

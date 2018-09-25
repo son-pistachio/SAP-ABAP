@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_35TOP                                     Report ZRBIG10_35
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRBIG10_35.
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : gt_bdcdata   TYPE TABLE OF bdcdata,      " For BDC Data
+       gt_messtab   TYPE TABLE OF bdcmsgcoll WITH HEADER LINE,   " For BDC Message
+       gs_bdcdata   TYPE bdcdata,
+       gs_params    TYPE ctu_params.            " For BDC option
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

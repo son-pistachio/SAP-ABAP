@@ -1,0 +1,55 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_46
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_46top                           .    " global Data
+
+INCLUDE zrbig10_46s01                           .  " Selection Screen
+INCLUDE zrbig10_46c01                           .  " ALV Event
+INCLUDE zrbig10_46o01                           .  " PBO-Modules
+INCLUDE zrbig10_46i01                           .  " PAI-Modules
+INCLUDE zrbig10_46f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_values.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> PURCHASING DOCUMENT LIST
+* TITLE110 --> POPUP FOR EKPO
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BUKRS         Company
+* S_BEDAT         Purchase Date
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+*102   Data has been saved
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

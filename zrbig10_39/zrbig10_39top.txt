@@ -1,0 +1,34 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG00_23TOP                                     Report ZRBIG00_23
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig00_23.
+
+
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : BEGIN OF gs_body,
+        prctr   TYPE cepc-prctr,      " Profit center
+        ktext   TYPE cepct-ktext,     " Profit center name
+        racct   TYPE faglflext-racct, " G/L Account
+        txt50   TYPE skat-txt50,      " G/L Account name
+        amount  TYPE faglflext-hslvt, " Amount
+       END OF gs_body.
+
+DATA : gt_body  LIKE TABLE OF gs_body,
+       gt_flext TYPE TABLE OF faglflext,
+       gt_cepct TYPE TABLE OF cepct,
+       gt_skat  TYPE TABLE OF skat,
+       gs_flext TYPE faglflext,
+       gs_cepct TYPE cepct,
+       gs_skat  TYPE skat.
+
+**********************************************************************
+* Common variable
+**********************************************************************
+DATA : gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

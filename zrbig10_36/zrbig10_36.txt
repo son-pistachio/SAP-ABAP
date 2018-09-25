@@ -1,0 +1,46 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_36
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_36top                           .    " global Data
+
+INCLUDE zrbig10_36s01                           .  " Selection screen
+* INCLUDE ZRBIG10_36I01                           .  " PAI-Modules
+INCLUDE zrbig10_36f01                           .  " FORM-Routines
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+*  START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+  PERFORM execute_bdc.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Document Header
+* T02 Line item
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BKTXT D       .
+* P_BLART D       .
+* P_BUDAT D       .
+* P_BUKRS D       .
+* P_DMBTR D       .
+* P_HKONT1 D       .
+* P_HKONT2 D       .
+* P_MODE D       .
+* P_WAERS D       .
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

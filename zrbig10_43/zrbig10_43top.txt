@@ -1,0 +1,56 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_43TOP                                     Report ZRBIG10_43
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_43.
+
+**********************************************************************
+* Type group : Local type
+**********************************************************************
+TYPES : tv_carrid1    TYPE c LENGTH 3,
+        tv_carrid2(3) TYPE c,
+        tv_carrid3(3).
+
+TYPES : tv_numc1    TYPE n LENGTH 5,
+        tv_numc2(5) TYPE n.
+
+TYPES : tv_pack1    TYPE p LENGTH 3 DECIMALS 2,
+        tv_pack2(5) TYPE p DECIMALS 2.
+
+* size ### #### ##
+TYPES : tv_int   TYPE i, " Integer
+        tv_float TYPE f, " Float
+        tv_dats  TYPE d, " Date
+        tv_tims  TYPE t, " Time
+        tv_str   TYPE string.
+
+*-- Local type structure
+TYPES : BEGIN OF ts_airline,
+          carrid   TYPE c LENGTH 3,
+          carrname TYPE scarr-carrname,
+          connid   TYPE s_conn_id,    " Global type Data element
+          date     TYPE tv_dats,      " Local type Data element
+        END OF ts_airline.
+
+*-- Local type table type
+TYPES tt_airline  TYPE TABLE OF ts_airline.
+
+**********************************************************************
+* Global variable
+**********************************************************************
+DATA : gv_carrid TYPE tv_carrid1,
+       gv_numc   TYPE tv_numc1,
+       gv_pack   TYPE tv_pack2,
+       gv_int    TYPE tv_int,
+       gv_dats   TYPE tv_dats.
+
+DATA : gv_carr    LIKE gv_carrid.
+
+DATA : gs_airline TYPE ts_airline,
+       gt_airline TYPE tt_airline.  " DATA gt_fcat TYPE lvc_t_fcat.
+
+DATA : gs_spfli TYPE spfli,
+       gt_spfli LIKE TABLE OF gs_spfli.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

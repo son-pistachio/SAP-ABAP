@@ -1,0 +1,57 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_53
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_53top                           .    " global Data
+
+INCLUDE zrbig10_53s01                           .  " Selection Screen
+INCLUDE zrbig10_53c01                           .  " ALV Event
+INCLUDE zrbig10_53o01                           .  " PBO-Modules
+INCLUDE zrbig10_53i01                           .  " PAI-Modules
+INCLUDE zrbig10_53f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_base_data.
+  PERFORM get_text_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> COST TOTALS
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_GJAHR D       .
+* P_LEDNR D       .
+* P_MONAT         Month
+* P_TWAER         Currency
+* P_VERSN D       .
+* P_WRTTP D       .
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

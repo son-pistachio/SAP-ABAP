@@ -1,0 +1,55 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_24C01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&       Class LCL_AIRLINE_INFO
+*&---------------------------------------------------------------------*
+*        Text
+*----------------------------------------------------------------------*
+CLASS lcl_airline_info DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS get_spfli IMPORTING i_carrid TYPE scarr-carrid
+                      EXPORTING e_subrc  TYPE sy-subrc
+                      CHANGING  t_spfli  TYPE tt_spfli.
+
+    METHODS get_scarr IMPORTING i_carrid TYPE scarr-carrid
+                      CHANGING  t_scarr  TYPE tt_scarr.
+
+    METHODS get_sflig IMPORTING i_carrid TYPE scarr-carrid
+                      EXPORTING e_msg    TYPE char50
+                                e_subrc  TYPE sy-subrc
+                      CHANGING  t_sflig  TYPE tt_sflig.
+
+*-- Static Method
+    CLASS-METHODS get_sbook IMPORTING i_carrid TYPE scarr-carrid
+                            EXPORTING e_subrc  TYPE sy-subrc
+                            CHANGING  t_sbook  TYPE tt_sbook.
+
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*&       Class (Implementation)  LCL_AIRLINE_INFO
+*&---------------------------------------------------------------------*
+*        Text
+*----------------------------------------------------------------------*
+CLASS lcl_airline_info IMPLEMENTATION.
+
+  METHOD get_spfli.
+    PERFORM get_spfli TABLES t_spfli USING i_carrid e_subrc.
+  ENDMETHOD.
+
+  METHOD get_scarr.
+    PERFORM get_scarr TABLES t_scarr USING i_carrid.
+  ENDMETHOD.
+
+  METHOD get_sflig.
+    PERFORM get_sflig TABLES t_sflig USING i_carrid e_msg e_subrc.
+  ENDMETHOD.
+
+  METHOD get_sbook.
+    PERFORM get_sbook TABLES t_sbook USING i_carrid e_subrc.
+  ENDMETHOD.
+ENDCLASS.               "LCL_AIRLINE_INFO
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

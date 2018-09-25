@@ -1,0 +1,160 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG00_23F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_rbukrs  = '1000'.
+  p_ryear   = sy-datum(4).
+  p_monat   = sy-datum+4(2).
+  p_rldnr   = '0L'.
+  p_rvers   = '1'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SUMMARY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_summary_data .
+
+  CLEAR gt_flext.
+  SELECT prctr racct
+         SUM( hsl01 ) AS hsl01
+         SUM( hsl02 ) AS hsl02
+         SUM( hsl03 ) AS hsl03
+         SUM( hsl04 ) AS hsl04
+         SUM( hsl05 ) AS hsl05
+         SUM( hsl06 ) AS hsl06
+         SUM( hsl07 ) AS hsl07
+         SUM( hsl08 ) AS hsl08
+         SUM( hsl09 ) AS hsl09
+         SUM( hsl10 ) AS hsl10
+         SUM( hsl11 ) AS hsl11
+         SUM( hsl12 ) AS hsl12
+    INTO CORRESPONDING FIELDS OF TABLE gt_flext
+    FROM faglflext
+    WHERE rbukrs  EQ p_rbukrs
+    AND   ryear   EQ p_ryear
+    AND   rldnr   EQ p_rldnr
+    AND   rvers   EQ p_rvers
+    GROUP BY prctr racct.
+
+  IF sy-subrc NE 0.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_TEXT_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_text_data .
+
+  DATA : lt_flext TYPE TABLE OF faglflext.
+
+*-- Get profit center name
+  lt_flext = gt_flext.
+
+  SORT lt_flext BY prctr ASCENDING.
+  DELETE ADJACENT DUPLICATES FROM lt_flext COMPARING prctr.
+
+  CLEAR gt_cepct.
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_cepct
+    FROM cepct
+    FOR ALL ENTRIES IN lt_flext
+    WHERE spras EQ sy-langu
+    AND   prctr EQ lt_flext-prctr.
+
+*-- Get G/L account name
+  lt_flext = gt_flext.
+
+  SORT lt_flext BY racct ASCENDING.
+  DELETE ADJACENT DUPLICATES FROM lt_flext COMPARING racct.
+
+  CLEAR gt_skat.
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_skat
+    FROM skat
+    FOR ALL ENTRIES IN lt_flext
+    WHERE spras EQ sy-langu
+    AND   ktopl EQ 'CAIN'   " Controlling area
+    AND   saknr EQ lt_flext-racct.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MAKE_DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM make_display_data .
+
+  DATA : lv_mon(2)  TYPE n,
+         lv_var(20).
+
+  FIELD-SYMBOLS <lv_amt> TYPE any.
+
+  SORT : gt_cepct BY prctr ASCENDING,
+         gt_skat  BY saknr ASCENDING.
+
+  CLEAR gt_body.
+  LOOP AT gt_flext INTO gs_flext.
+
+    MOVE-CORRESPONDING gs_flext TO gs_body. " Move prctr, racct TO gs_body
+
+*-- Set profit center name
+    CLEAR gs_cepct.
+    READ TABLE gt_cepct INTO gs_cepct WITH KEY prctr = gs_body-prctr
+                                      BINARY SEARCH.
+    IF sy-subrc EQ 0.
+      gs_body-ktext = gs_cepct-ktext.
+    ENDIF.
+
+*-- Set G/L account name
+    CLEAR gs_skat.
+    READ TABLE gt_skat INTO gs_skat WITH KEY saknr = gs_body-racct
+                                    BINARY SEARCH.
+    IF sy-subrc EQ 0.
+      gs_body-txt50 = gs_skat-txt50.
+    ENDIF.
+
+*-- Calcul monthly amount
+    CLEAR lv_mon.
+    DO p_monat TIMES.
+
+      lv_mon  = lv_mon + 1. " Increase month
+
+      CLEAR lv_var.
+      CONCATENATE 'gs_flext-hsl' lv_mon INTO lv_var. " Make variable
+      ASSIGN (lv_var) TO <lv_amt>. " ASSIGN gs_flext-hslXX TO <lv_amt>
+
+      gs_body-amount  = gs_body-amount + <lv_amt>.
+
+    ENDDO.
+
+    APPEND gs_body TO gt_body.
+    CLEAR gs_body.
+
+  ENDLOOP.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

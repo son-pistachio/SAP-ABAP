@@ -1,0 +1,53 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG00_23
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE ZRBIG10_39TOP.
+*INCLUDE zrbig00_23top                           .    " global Data
+
+INCLUDE ZRBIG10_39S01.
+*INCLUDE zrbig00_23s01                           .  " Selection screen
+INCLUDE ZRBIG10_39F01.
+*INCLUDE zrbig00_23f01                           .  " FORM-Routines
+
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+* START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+  PERFORM get_summary_data.
+  PERFORM get_text_data.
+  PERFORM make_display_data.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_MONAT D       .
+* P_RBUKRS D       .
+* P_RLDNR D       .
+* P_RVERS D       .
+* P_RYEAR D       .
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

@@ -1,0 +1,34 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_23TOP                                     Report ZRBIG10_23
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRBIG10_23.
+
+TABLES : bkpf.
+
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+       go_container TYPE REF TO cl_gui_docking_container.
+
+DATA : BEGIN OF gs_body,
+        gjahr   TYPE bkpf-gjahr,
+        belnr   TYPE bkpf-belnr,
+        bktxt   TYPE bkpf-bktxt,
+        shkzg   TYPE bsis-shkzg,
+        hkont   TYPE bsis-hkont,
+        txt50   TYPE skat-txt50,
+        dmbtr   TYPE bsis-dmbtr,
+        waers   TYPE bsis-waers,
+      END OF gs_body.
+
+DATA : gt_body    LIKE TABLE OF gs_body,
+       gt_skat    TYPE TABLE OF skat,
+       gs_skat    TYPE skat.
+
+DATA : gt_fcat    TYPE lvc_t_fcat,
+       gs_fcat    TYPE lvc_s_fcat,
+       gs_layout  TYPE lvc_s_layo.
+
+DATA : gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

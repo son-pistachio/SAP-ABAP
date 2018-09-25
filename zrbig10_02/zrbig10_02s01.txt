@@ -1,0 +1,49 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_02S01
+*&---------------------------------------------------------------------*
+**********************************************************************
+*Selection Screen
+**********************************************************************
+
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.
+PARAMETERS : p_carrid TYPE scarr-carrid   OBLIGATORY MODIF ID car,    " Eidt <--> Read only
+             p_curr   TYPE scarr-currcode OBLIGATORY.
+
+SELECT-OPTIONS : s_fldate FOR sbook-fldate MODIF ID fld,    " Active <--> Inactive
+                 s_connid FOR spfli-connid,
+                 s_city   FOR spfli-cityfrom.
+SELECTION-SCREEN END OF BLOCK pa1.
+
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE TEXT-t02.
+PARAMETERS : p_air    RADIOBUTTON GROUP rb1 USER-COMMAND evt,
+             p_fldate RADIOBUTTON GROUP rb1.
+SELECTION-SCREEN END OF BLOCK pa2.
+
+SELECTION-SCREEN PUSHBUTTON /pos_low(12) gv_text USER-COMMAND on.
+SELECTION-SCREEN PUSHBUTTON /pos_high(20) gv_t01 USER-COMMAND on01.
+SELECTION-SCREEN PUSHBUTTON /pos_high(50) gv_t02 USER-COMMAND on01.
+SELECTION-SCREEN PUSHBUTTON /pos_high(5)  gv_t03 USER-COMMAND on.
+
+SELECTION-SCREEN SKIP.
+
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME.
+
+SELECTION-SCREEN BEGIN OF LINE.
+
+SELECTION-SCREEN COMMENT 1(10) TEXT-001 FOR FIELD p1.
+SELECTION-SCREEN POSITION 11.
+PARAMETERS:p1  TYPE char5.
+*--------------------------------------------------------------------*
+SELECTION-SCREEN COMMENT 17(10) TEXT-002 FOR FIELD p1.
+SELECTION-SCREEN POSITION 28.
+PARAMETERS:p2  TYPE char5.
+*--------------------------------------------------------------------*
+SELECTION-SCREEN COMMENT 34(10) TEXT-003 FOR FIELD p1.
+PARAMETERS:p3  TYPE char5.
+
+SELECTION-SCREEN END OF LINE.
+SELECTION-SCREEN END OF BLOCK b1.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

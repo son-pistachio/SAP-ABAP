@@ -1,0 +1,58 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_50TOP                                     Report ZRBIG10_50
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_50 MESSAGE-ID k5.
+
+TABLES vbak.
+
+DATA : BEGIN OF gs_body,
+         vbeln  TYPE vbak-vbeln,
+         auart  TYPE vbak-auart,
+         kunnr  TYPE vbak-kunnr,
+         name1  TYPE kna1-name1,
+         netwr  TYPE vbak-netwr,
+         waerk  TYPE vbak-waerk,
+       END OF gs_body,
+
+       BEGIN OF gs_pop_body,
+         vbeln  TYPE vbap-vbeln,
+         posnr  TYPE vbap-posnr,
+         matkl  TYPE vbap-matkl,
+         wgbez  TYPE t023t-wgbez,
+         netwr  TYPE vbap-netwr,
+         waerk  TYPE vbap-waerk,
+         END OF gs_pop_body,
+
+       gs_t023t TYPE t023t,
+       gs_vbap  TYPE vbap,
+       gs_kna1  TYPE kna1.
+
+DATA : gt_body     LIKE TABLE OF gs_body,
+       gt_pop_body LIKE TABLE OF gs_pop_body,
+       gt_t023t    LIKE TABLE OF gs_t023t,
+       gt_vbap     LIKE TABLE OF gs_vbap,
+       gt_kna1     LIKE TABLE OF gs_kna1.
+
+DATA : go_container TYPE REF TO cl_gui_docking_container,
+       go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+
+       go_pop_cont  TYPE REF TO cl_gui_custom_container,
+       go_pop_grid  TYPE REF TO cl_gui_alv_grid.
+
+DATA : gs_layout  TYPE lvc_s_layo,
+       gs_sort    TYPE lvc_s_sort,
+       gt_sort    LIKE TABLE OF gs_sort,
+       gs_fcat    TYPE lvc_s_fcat,
+       gt_fcat    TYPE lvc_t_fcat,
+
+       gs_pop_layo  TYPE lvc_s_layo,
+       gs_pop_sort  TYPE lvc_s_sort,
+       gt_pop_sort  TYPE lvc_t_sort,
+       gs_pop_fcat  TYPE lvc_s_fcat,
+       gt_pop_fcat  TYPE lvc_t_fcat.
+
+DATA : gv_okcode TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

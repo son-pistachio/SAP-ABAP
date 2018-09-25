@@ -1,0 +1,43 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZSBIG10_01_S01
+*&---------------------------------------------------------------------*
+**********************************************************************
+*Selection Screen
+**********************************************************************
+
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.          "##### begin, TITLE text-##,##
+PARAMETERS : p_carrid  TYPE scarr-carrid,                   "parameter #### default
+             p_carr(3) DEFAULT 'AA' NO-DISPLAY,                         "NO-DISPLAY ### ##
+             p_hakbun(10) MATCHCODE OBJECT ZSHBIG10_01.
+
+SELECT-OPTIONS : s_carrid FOR scarr-carrid   NO INTERVALS,                "TO ### ### ##
+                 s_curr   FOR scarr-currcode ,              "multiple selection ## ##
+                 s_url    FOR scarr-url      NO INTERVALS NO-EXTENSION,
+                 s_connid FOR spfli-connid.
+
+SELECTION-SCREEN END OF BLOCK pa1.
+
+SELECTION-SCREEN SKIP.
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE TEXT-t02.
+PARAMETERS : p_check1 AS CHECKBOX DEFAULT 'X',
+             p_check2 AS CHECKBOX.
+SELECTION-SCREEN END OF BLOCK pa2.
+SELECTION-SCREEN SKIP.
+
+SELECTION-SCREEN BEGIN OF BLOCK pa3 WITH FRAME TITLE TEXT-t03.
+
+PARAMETERS : p_rb1 RADIOBUTTON GROUP rb1,
+             p_rb2 RADIOBUTTON GROUP rb1,
+             p_rb3 RADIOBUTTON GROUP rb1.
+SELECTION-SCREEN END OF BLOCK pa3.
+SELECTION-SCREEN ULINE.
+
+
+SELECTION-SCREEN BEGIN OF BLOCK pa4 WITH FRAME TITLE TEXT-t04.
+PARAMETERS : p_ra1 RADIOBUTTON GROUP rb2 DEFAULT 'X',
+             p_ra2 RADIOBUTTON GROUP rb2.
+SELECTION-SCREEN END OF BLOCK pa4.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

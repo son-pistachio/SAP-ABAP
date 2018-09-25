@@ -1,0 +1,139 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_36F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_bukrs = '1000'.
+  p_budat = sy-datum.
+  p_waers = 'KRW'.
+  p_blart = 'SA'.
+  p_bktxt = 'Document header text'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  EXECUTE_BDC
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM execute_bdc .
+
+  DATA : lv_message    TYPE string,
+         lv_amount(13).
+
+*-- Write format
+  WRITE p_dmbtr CURRENCY p_waers TO lv_amount. " ### ## p_waers# #### ##### lv_amount# ####.
+*  WRITE p_quan UNIT p_unit to lv_quantity. " ### ### p_unit# ### #### lv_quantity# ####.
+
+*-- Remove space
+  CONDENSE lv_amount NO-GAPS. " ### ####.
+
+  CLEAR : gt_bdcdata, gs_bdcdata.
+  "Dynbegin Program(Fnam)   Dynpro(Fval)
+  PERFORM dynpro USING : 'X'      'SAPMF05A'      '0100',
+                         ' '      'BDC_OKCODE'    '/00',
+                         ' '      'BKPF-BLDAT'    p_budat,
+                         ' '      'BKPF-BLART'    p_blart,
+                         ' '      'BKPF-BUKRS'    p_bukrs,
+                         ' '      'BKPF-BUDAT'    p_budat,
+                         ' '      'BKPF-MONAT'    p_budat+4(2),
+                         ' '      'BKPF-WAERS'    p_waers,
+                         ' '      'BKPF-BKTXT'    p_bktxt,
+                         ' '      'RF05A-NEWBS'   '40',
+                         ' '      'RF05A-NEWKO'   p_hkont1,
+                         'X'      'SAPMF05A'      '0300',
+                         ' '      'BDC_OKCODE'    '/00',
+                         ' '      'BSEG-WRBTR'    lv_amount,
+                         ' '      'BSEG-SGTXT'    'Debit item',
+                         ' '      'RF05A-NEWBS'   '50',
+                         ' '      'RF05A-NEWKO'   p_hkont2,
+                         'X'      'SAPLKACB'      '0002',
+                         ' '      'BDC_OKCODE'    '=ENTE',
+                         ' '      'COBL-GSBER'    p_bukrs,
+                         'X'      'SAPMF05A'      '0300',
+                         ' '      'BDC_OKCODE'    '=BU',
+                         ' '      'BSEG-WRBTR'    lv_amount,
+                         ' '      'BSEG-SGTXT'    'Credit item',
+                         'X'      'SAPLKACB'      '0002',
+                         ' '      'BDC_OKCODE'    '=ENTE',
+                         ' '      'COBL-GSBER'    p_bukrs.
+
+*-- Set BDC Option
+  gs_params-dismode   = p_mode.
+  gs_params-updmode   = 'S'.
+  gs_params-racommit  = 'X'.
+  gs_params-nobiend   = space.
+
+  CLEAR : gt_messtab, gt_messtab[].
+  CALL TRANSACTION 'FB01' USING gt_bdcdata
+                          OPTIONS FROM gs_params
+                          MESSAGES INTO gt_messtab.
+
+*-- Check success
+  CLEAR gt_messtab.
+  READ TABLE gt_messtab WITH KEY msgid = 'F5'
+                                 msgnr = '312'.
+  IF sy-subrc EQ 0.
+
+    WRITE :/ icon_led_green, gt_messtab-msgv1.
+
+  ELSE.
+*-- All emssage read
+    LOOP AT gt_messtab.
+
+      CALL FUNCTION 'MESSAGE_TEXT_BUILD'
+        EXPORTING
+          msgid               = gt_messtab-msgid
+          msgnr               = gt_messtab-msgnr
+          msgv1               = gt_messtab-msgv1
+          msgv2               = gt_messtab-msgv2
+          msgv3               = gt_messtab-msgv3
+          msgv4               = gt_messtab-msgv4
+        IMPORTING
+          message_text_output = lv_message.
+
+    ENDLOOP.
+
+    WRITE :/ icon_led_red, lv_message.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DYNPRO
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0030   text
+*      -->P_0031   text
+*      -->P_0032   text
+*----------------------------------------------------------------------*
+FORM dynpro  USING pv_begin pv_fnam pv_fval.
+
+  IF pv_begin EQ 'X'.
+    gs_bdcdata-dynbegin = pv_begin.
+    gs_bdcdata-program  = pv_fnam.
+    gs_bdcdata-dynpro   = pv_fval.
+  ELSE.
+    gs_bdcdata-fnam   = pv_fnam.
+    gs_bdcdata-fval   = pv_fval.
+
+  ENDIF.
+
+  APPEND gs_bdcdata TO gt_bdcdata.
+  CLEAR gs_bdcdata.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

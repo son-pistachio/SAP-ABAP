@@ -1,0 +1,18 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_17S01
+*&---------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.
+PARAMETERS p_carrid   TYPE scarr-carrid OBLIGATORY.
+SELECT-OPTIONS : s_connid   FOR sticket-connid MODIF ID CON,
+                 s_id       FOR scustom-id MODIF ID ID.
+SELECTION-SCREEN END OF BLOCK pa1.
+
+SELECTION-SCREEN SKIP.
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE TEXT-t02.
+PARAMETERS : p_tick RADIOBUTTON GROUP rb1 USER-COMMAND evt,
+             p_cust RADIOBUTTON GROUP rb1.
+SELECTION-SCREEN END OF BLOCK pa2.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

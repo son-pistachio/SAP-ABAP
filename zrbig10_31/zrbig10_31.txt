@@ -1,0 +1,57 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_31
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_31top                           .    " global Data
+
+INCLUDE zrbig10_31s01                           .  " Selection Screen
+* INCLUDE ZRBIG10_31I01                           .  " PAI-Modules
+ INCLUDE ZRBIG10_31F01                           .  " FORM-Routines
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+* START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+
+  CASE 'X'.
+
+    WHEN r_scarr.
+      PERFORM get_scarr_data.
+    WHEN r_spfli.
+      PERFORM get_spfli_data.
+    WHEN r_flight.
+      PERFORM get_sflight_data.
+    WHEN r_sbook.
+      PERFORM get_sbook_data.
+
+  ENDCASE.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+* T02 Choice
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BOOKID         Booking id
+* P_CARRID         Airline
+* P_CONNID         Connection
+* P_FLDATE         Flight date
+* R_FLIGHT         SFLIGHT
+* R_SBOOK         SBOOK
+* R_SCARR         SCARR
+* R_SPFLI         SPFLI
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

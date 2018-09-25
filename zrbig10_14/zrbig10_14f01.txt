@@ -1,0 +1,135 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_14F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid  = 'LH'.
+
+  s_connid-sign   = 'I'.
+  s_connid-option = 'EQ'.
+  s_connid-low    = '400'.
+
+  APPEND s_connid.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CHECK-PARAM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM check-param .
+*-- Master code check
+  DATA : ls_spfli TYPE spfli.
+
+  CHECK p_carrid IS NOT INITIAL.
+  CHECK s_connid-low IS NOT INITIAL.
+
+  CLEAR ls_spfli.
+  SELECT SINGLE *
+    INTO CORRESPONDING FIELDS OF ls_spfli
+    FROM spfli
+    WHERE carrid EQ p_carrid
+    AND   connid EQ s_connid-low.
+
+  IF ls_spfli IS INITIAL.
+    MESSAGE s001(k5) WITH TEXT-e01 DISPLAY LIKE 'E'.
+    STOP.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_CONNERTION-DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_connertion-data .
+  CLEAR : gt_spfli, gs_spfli.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_spfli
+    FROM spfli
+    WHERE carrid EQ p_carrid
+    AND   connid IN s_connid.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  INIT_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM init_screen .
+
+  PERFORM set_layout.
+
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name = 'SPFLI'
+        i_save           = 'A'
+        i_default        = 'X'
+        is_layout        = gs_layout
+      CHANGING
+        it_outtab        = gt_spfli.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+  gs_layout-zebra       = 'X'.
+  gs_layout-cwidth_opt  = 'X'.
+  gs_layout-sel_mode    = 'D'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+*  CREATE OBJECT go_container
+*    EXPORTING
+*      container_name = 'GO_CONT'.
+  CREATE OBJECT go_container
+    EXPORTING
+      repid     = sy-repid
+      dynnr     = sy-dynnr
+      side      = go_container->dock_at_left
+      extension = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

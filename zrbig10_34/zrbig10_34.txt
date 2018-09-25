@@ -1,0 +1,61 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_34
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_34top                           .    " global Data
+
+INCLUDE zrbig10_34s01                           .  " Selection screen
+INCLUDE zrbig10_34c01                           .  " ALV Event
+INCLUDE zrbig10_34o01                           .  " PBO-Modules
+INCLUDE zrbig10_34i01                           .  " PAI-Modules
+INCLUDE zrbig10_34f01                           .  " FORM-Routines
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+* START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+  PERFORM get_summary_data.   " Using group by query
+  PERFORM get_text_data.
+  PERFORM make_display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> [FI] Account Balance
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_RBUKRS         Company
+* P_RLDNR         Ledger
+* P_RVERS         Version
+* P_RYEAR         Fiscal year
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

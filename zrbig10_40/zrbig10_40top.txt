@@ -1,0 +1,68 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_40TOP                                     Report ZRBIG10_40
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_40 MESSAGE-ID k5.
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : BEGIN OF gs_body,
+         mjahr TYPE mkpf-mjahr,
+         mblnr TYPE mkpf-mblnr,
+         awsys TYPE mkpf-awsys,
+         vgart TYPE mkpf-vgart,
+         xblnr TYPE mkpf-xblnr,
+       END OF gs_body.
+
+DATA : BEGIN OF gs_body2,
+         mblnr TYPE mseg-mblnr,
+         matnr TYPE mseg-matnr,
+         maktx TYPE makt-maktx,
+         werks TYPE mseg-werks,
+         name1 TYPE t001w-name1,
+         dmbtr TYPE mseg-dmbtr,
+         waers TYPE mseg-waers,
+       END OF gs_body2,
+
+       gs_mseg   TYPE mseg,
+       gs_makt   TYPE makt,
+       gs_t001w  TYPE t001w.
+
+DATA : gt_body  LIKE TABLE OF gs_body,
+       gt_body2 LIKE TABLE OF gs_body2,
+       gt_makt LIKE TABLE OF gs_makt,
+       gt_t001w LIKE TABLE OF gs_t001w,
+       gt_mseg  LIKE TABLE OF gs_mseg.
+
+**********************************************************************
+* Class instance
+**********************************************************************
+DATA : go_container TYPE REF TO cl_gui_docking_container,
+       go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+
+       go_pop_cont  TYPE REF TO cl_gui_custom_container,
+       go_pop_grid  TYPE REF TO cl_gui_alv_grid.
+
+**********************************************************************
+* Layout / Sort / Field Catalog
+**********************************************************************
+DATA : gs_layout   TYPE lvc_s_layo,
+       gs_sort     TYPE lvc_s_sort,
+       gt_sort     TYPE lvc_t_sort,
+       gs_fcat     TYPE lvc_s_fcat,
+       gt_fcat     TYPE lvc_t_fcat,
+
+       gs_pop_layo TYPE lvc_s_layo,
+       gs_pop_sort TYPE lvc_s_sort,
+       gt_pop_sort TYPE lvc_t_sort,
+       gs_pop_fcat TYPE lvc_s_fcat,
+       gt_pop_fcat TYPE lvc_t_fcat.
+
+**********************************************************************
+* Common Variable
+**********************************************************************
+DATA : gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

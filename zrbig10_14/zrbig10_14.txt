@@ -1,0 +1,57 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_14
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_14top                           .    " global Data
+
+INCLUDE zrbig10_14s01                           .  " Selection Screen
+INCLUDE zrbig10_14o01                           .  " PBO-Modules
+INCLUDE zrbig10_14i01                           .  " PAI-Modules
+INCLUDE zrbig10_14f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+AT SELECTION-SCREEN.
+  PERFORM check-param.
+
+START-OF-SELECTION.
+  PERFORM get_connertion-data.
+
+  IF gt_spfli IS NOT INITIAL.
+    CALL SCREEN 100.
+
+  ELSE.
+    MESSAGE S037(k5) DISPLAY LIKE 'E'.
+
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> TITLE100
+
+*Text elements
+*----------------------------------------------------------
+* E01 ERROR
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_CARRID         Airline
+* S_CONNID         Connection
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

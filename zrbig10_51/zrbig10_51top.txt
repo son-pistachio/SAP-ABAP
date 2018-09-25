@@ -1,0 +1,60 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_51TOP                                     Report ZRBIG10_51
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_51 MESSAGE-ID k5.
+
+DATA : BEGIN OF gs_body,
+         aufnr  TYPE afko-aufnr,
+         plnbez TYPE afko-plnbez,
+         maktx  TYPE makt-maktx,
+         plnty  TYPE afko-plnty,
+         txt    TYPE tca02-txt,
+         plnnr  TYPE afko-plnnr,
+         klvarp TYPE afko-klvarp,
+         klvari TYPE afko-klvari,
+       END OF gs_body,
+
+       BEGIN OF gs_pop_body,
+         aufnr TYPE afpo-aufnr,
+         posnr TYPE afpo-posnr,
+         psmng TYPE afpo-psmng,
+         meins TYPE afpo-meins,
+         pwerk TYPE afpo-pwerk,
+         name1 TYPE t001w-name1,
+       END OF gs_pop_body,
+
+       gs_makt  TYPE makt,
+       gs_afpo  TYPE afpo,
+       gs_tca02 TYPE tca02,
+       gs_t001w TYPE t001w.
+
+DATA : gt_body     LIKE TABLE OF gs_body,
+       gt_pop_body LIKE TABLE OF gs_pop_body,
+       gt_makt     LIKE TABLE OF gs_makt,
+       gt_afpo     LIKE TABLE OF gs_afpo,
+       gt_tca02    LIKE TABLE OF gs_tca02,
+       gt_t001w    LIKE TABLE OF gs_t001w.
+
+DATA : go_container TYPE REF TO cl_gui_docking_container,
+       go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+
+       go_pop_cont  TYPE REF TO cl_gui_custom_container,
+       go_pop_grid  TYPE REF TO cl_gui_alv_grid.
+
+DATA : gs_layout   TYPE lvc_s_layo,
+       gs_sort     TYPE lvc_s_sort,
+       gt_sort     LIKE TABLE OF gs_sort,
+       gs_fcat     TYPE lvc_s_fcat,
+       gt_fcat     TYPE lvc_t_fcat,
+
+       gs_pop_layout TYPE lvc_s_layo,
+       gs_pop_sort TYPE lvc_s_sort,
+       gt_pop_sort TYPE lvc_t_sort,
+       gs_pop_fcat TYPE lvc_s_fcat,
+       gt_pop_fcat TYPE lvc_t_fcat.
+
+DATA : gv_okcode TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

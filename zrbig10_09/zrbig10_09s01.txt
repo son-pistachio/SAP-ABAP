@@ -1,0 +1,27 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_09S01
+*&---------------------------------------------------------------------*
+
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE text-t01.
+
+  PARAMETERS p_carrid     TYPE scarr-carrid OBLIGATORY.
+  SELECT-OPTIONS : s_connid FOR  spfli-connid,
+                   s_carrid FOR  scarr-carrid.
+
+SELECTION-SCREEN END OF BLOCK pa1.
+
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE text-t02.
+
+*-- Inner Join
+  PARAMETERS : p_air  RADIOBUTTON GROUP rb1,
+               p_book RADIOBUTTON GROUP rb1,
+
+*-- For all Entries
+               p_fair  RADIOBUTTON GROUP rb1, " SCARR   & SPFLI
+               p_fbook RADIOBUTTON GROUP rb1. " SFLIGHT & SBOOK
+
+SELECTION-SCREEN END OF BLOCK pa2.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

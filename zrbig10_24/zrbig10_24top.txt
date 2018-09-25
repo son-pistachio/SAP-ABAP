@@ -1,0 +1,69 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_24TOP                                     Report ZRBIG10_24
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_24 LINE-SIZE 1000.
+
+* public instance# ###### ######.
+CLASS lcl_airline_info DEFINITION DEFERRED.
+
+**********************************************************************
+* TYPES
+**********************************************************************
+TYPES : BEGIN OF ts_spfli.
+    INCLUDE STRUCTURE spfli.
+TYPES : END OF ts_spfli.
+
+TYPES : BEGIN OF ts_scarr.
+    INCLUDE STRUCTURE scarr.
+TYPES : icon TYPE icon-id,
+        END OF ts_scarr.
+
+TYPES : BEGIN OF ts_sflig.
+    INCLUDE STRUCTURE sflight.
+TYPES : icon TYPE icon-id,
+        END OF ts_sflig.
+
+TYPES : BEGIN OF ts_sbook,
+          carrid TYPE sbook-carrid,
+          connid TYPE sbook-connid,
+          fldate TYPE sbook-fldate,
+          bookid TYPE sbook-bookid,
+          smoker TYPE sbook-smoker,
+        END OF ts_sbook.
+" ###### ####### ### #### ### ##.
+*-- Table type
+TYPES : tt_spfli TYPE TABLE OF ts_spfli,
+        tt_scarr TYPE TABLE OF ts_scarr,
+        tt_sflig TYPE TABLE OF ts_sflig,
+        tt_sbook TYPE TABLE OF ts_sbook.
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : gt_spfli TYPE tt_spfli,
+       gs_spfli TYPE LINE OF tt_spfli,
+       gt_scarr TYPE tt_scarr,
+       gs_scarr TYPE ts_scarr,
+       gt_sflig TYPE tt_sflig,
+       gs_sflig TYPE ts_sflig,
+       gt_sbook TYPE tt_sbook,
+       gs_sbook TYPE ts_sbook.
+
+DATA : gt_scarr2  TYPE zlvc_t_scarr10,
+       gt_spfli2  TYPE zlvc_t_spfli10,
+       gt_sflig2  TYPE zlvc_t_sflig10,
+       gt_sbook2  TYPE zlvc_t_sbook10,
+       gs_scarr2  TYPE LINE OF zlvc_t_scarr10,
+       gs_spfli2  TYPE LINE OF zlvc_t_spfli10,
+       gs_sflig2  TYPE LINE OF zlvc_t_sflig10,
+       gs_sbook2  TYPE LINE OF zlvc_t_sbook10.
+
+**********************************************************************
+* Class instance
+**********************************************************************
+DATA : go_airline TYPE REF TO lcl_airline_info. " <- ### public instance
+DATA : go_flight  TYPE REF TO zcl_airline_info10_01.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

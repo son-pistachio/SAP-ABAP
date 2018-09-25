@@ -1,0 +1,157 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_48F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid = 'LH'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_FLIGHT_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_flight_data .
+*-- Get SCARR data
+
+  CLEAR gs_scarr.
+  SELECT SINGLE * INTO CORRESPONDING FIELDS OF gs_scarr
+    FROM scarr
+    WHERE carrid EQ p_carrid.
+
+*-- Get SPFLI DATA
+  CLEAR gt_spfli.
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_spfli
+    FROM spfli
+    WHERE carrid EQ p_carrid.
+
+*-- Get SFLIGHT DATA
+  CLEAR gt_sflight.
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_sflight
+    FROM sflight
+    WHERE carrid EQ p_carrid.
+
+*-- Get SBOOK DATA
+  CLEAR gs_sbook.
+  SELECT SINGLE * INTO CORRESPONDING FIELDS OF gs_sbook
+    FROM sbook
+    WHERE carrid EQ p_carrid.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SPFLI_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_spfli_data .
+
+  gs_spfli_layo-zebra       = 'X'.
+  gs_spfli_layo-cwidth_opt  = 'X'.
+  gs_spfli_layo-sel_mode    = 'D'.
+
+  IF go_spfli_cont IS INITIAL.
+
+    PERFORM create_spfli_object.
+
+    CALL METHOD go_spfli_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name              = 'SPFLI'
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_spfli_layo
+      CHANGING
+        it_outtab                     = gt_spfli
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+  ELSE.
+    CALL METHOD go_spfli_grid->refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_SPFLI_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_spfli_object .
+
+  CREATE OBJECT go_spfli_cont
+    EXPORTING
+      container_name = 'SPFLI_CONT'.
+  CREATE OBJECT go_spfli_grid
+    EXPORTING
+      i_parent = go_spfli_cont.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SFLIGHT_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_sflight_data .
+
+  gs_sflig_layo-zebra       = 'X'.
+  gs_sflig_layo-cwidth_opt  = 'X'.
+  gs_sflig_layo-sel_mode    = 'D'.
+
+  IF go_sflig_cont IS INITIAL.
+
+    PERFORM create_sflig_object.
+    CALL METHOD go_sflig_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name              = 'SFLIGHT'
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_sflig_layo
+      CHANGING
+        it_outtab                     = gt_sflight
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+  ELSE.
+    CALL METHOD go_sflig_grid->refresh_table_display.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_SFLIG_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_sflig_object .
+  CREATE OBJECT go_sflig_cont
+    EXPORTING
+      container_name = 'SFLIG_CONT'.
+  CREATE OBJECT go_sflig_grid
+    EXPORTING
+      i_parent = go_sflig_cont.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

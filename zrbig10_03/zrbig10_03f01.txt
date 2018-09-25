@@ -1,0 +1,77 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_03F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_carrid  = 'LH'.
+
+  s_fldate-sign   = 'I'.
+  s_fldate-option = 'EQ'.
+  s_fldate-low    = sy-datum.
+  APPEND s_fldate.
+  CLEAR s_fldate.
+
+  s_bookid-sign   = 'I'.
+  s_bookid-option = 'BT'.
+  s_bookid-low    = '100'.
+  s_bookid-high   = '500'.
+  APPEND s_bookid.
+  CLEAR s_bookid.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CONTROL_TEST
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM control_test .
+
+  CLEAR : gt_sflight, gs_sflight.
+  gs_sflight-carrid     = 'AA'.
+  gs_sflight-connid     = '17'.
+  gs_sflight-fldate     = '20170623'.
+  gs_sflight-price      = 42294.
+  gs_sflight-currency   = 'USD'.
+  gs_sflight-planetype  = '747-400'.
+  APPEND gs_sflight to gt_sflight.
+  CLEAR gs_sflight.
+
+  gs_sflight-carrid     = 'AZ'.
+  gs_sflight-connid     = '555'.
+  gs_sflight-fldate     = '20170420'.
+  gs_sflight-price      = 18500.
+  gs_sflight-currency   = 'EUR'.
+  gs_sflight-planetype  = 'A319-100'.
+  APPEND gs_sflight to gt_sflight.
+  CLEAR gs_sflight.
+
+  gs_sflight-carrid     = 'DL'.
+  gs_sflight-connid     = '106'.
+  gs_sflight-fldate     = '20170418'.
+  gs_sflight-price      = 61101.
+  gs_sflight-currency   = 'USD'.
+  gs_sflight-planetype  = 'A340-600'.
+  APPEND gs_sflight to gt_sflight.
+  CLEAR gs_sflight.
+
+  LOOP AT gt_sflight INTO gs_sflight.
+
+    WRITE :/ gs_sflight-carrid, gs_sflight-connid, gs_sflight-fldate, gs_sflight-price, gs_sflight-currency, gs_sflight-planetype.
+
+  ENDLOOP.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

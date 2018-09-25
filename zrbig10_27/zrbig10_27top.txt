@@ -1,0 +1,40 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_27TOP                                     Report ZRBIG10_27
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_27.
+
+CLASS lcl_event_handler DEFINITION DEFERRED.
+
+TABLES bkpf.
+
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+       go_container TYPE REF TO cl_gui_docking_container.
+
+DATA :  go_handler  TYPE REF TO lcl_event_handler.
+
+DATA : BEGIN OF gs_body,
+         gjahr TYPE bkpf-gjahr,
+         belnr TYPE bkpf-belnr,
+         glvor TYPE bkpf-glvor,
+         shkzg TYPE bsik-shkzg,
+         lifnr TYPE bsik-lifnr,
+         name1 TYPE lfa1-name1,
+         dmbtr TYPE bsis-dmbtr,
+         waers TYPE bsis-waers,
+       END OF gs_body.
+
+DATA : gt_body LIKE TABLE OF gs_body,
+       gt_lfa1 TYPE TABLE OF lfa1,
+       gs_lfa1 TYPE lfa1.
+
+DATA : gt_fcat   TYPE lvc_t_fcat,
+       gs_fcat   TYPE lvc_s_fcat,
+       gs_sort   TYPE lvc_s_sort,
+       gt_sort   LIKE TABLE OF gs_sort,
+       gs_layout TYPE lvc_s_layo.
+
+DATA : gv_okcode TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

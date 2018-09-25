@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG00_23S01
+*&---------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.
+PARAMETERS : p_rbukrs TYPE faglflext-rbukrs,
+             p_ryear  TYPE faglflext-ryear,
+             p_monat  TYPE bkpf-monat,
+             p_rldnr  TYPE faglflext-rldnr,
+             p_rvers  TYPE faglflext-rvers.
+SELECTION-SCREEN END OF BLOCK pa1.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

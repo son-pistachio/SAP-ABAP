@@ -1,0 +1,52 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_20TOP                                     Report ZRBIG10_20
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_20.
+
+**********************************************************************
+* Tables
+**********************************************************************
+TABLES sdessert.
+
+**********************************************************************
+* Instance
+**********************************************************************
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+       go_container TYPE REF TO cl_gui_custom_container.
+
+
+**********************************************************************
+* Internal Tables and Work Area
+**********************************************************************
+DATA : BEGIN OF gs_sde1.
+    INCLUDE STRUCTURE sdessert.
+DATA : icon   TYPE icon-id,
+       col(4),
+       txt    TYPE smealt-text,
+       END OF gs_sde1.
+
+*DATA : BEGIN OF gs_sde2,
+*        carrid      TYPE scarr-carrid,
+*        mealnumber  TYPE sdessert-mealnumber,
+*        hot         TYPE sdessert-hot,
+*        col(4),
+*       END OF gs_sde2.
+
+DATA : gt_sde1   LIKE TABLE OF gs_sde1,
+       gt_smealt TYPE TABLE OF smealt,    " for text
+*       gt_sde2 LIKE TABLE OF gs_sde2.
+       gs_smealt TYPE smealt.
+
+DATA : gt_fcat   TYPE lvc_t_fcat,
+       gs_fcat   TYPE lvc_s_fcat,
+       gs_layout TYPE lvc_s_layo.
+
+
+**********************************************************************
+* Common Variable
+**********************************************************************
+DATA gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

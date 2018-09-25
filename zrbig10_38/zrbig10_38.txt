@@ -1,0 +1,55 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_38
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_38top                           .    " global Data
+
+INCLUDE zrbig10_38s01                           .  " Selection screen
+INCLUDE zrbig10_38o01                           .  " PBO-Modules
+INCLUDE zrbig10_38i01                           .  " PAI-Modules
+INCLUDE zrbig10_38f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM get_amount_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> G/L Account balance
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_MONAT         Month
+* P_RBUKRS         Company
+* P_RLDNR D       .
+* P_RVERS D       .
+* P_RYEAR D       .
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

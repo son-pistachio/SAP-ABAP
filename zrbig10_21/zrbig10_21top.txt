@@ -1,0 +1,60 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_21TOP                                     Report ZRBIG10_21
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_21.
+
+CLASS lcl_event_handler DEFINITION DEFERRED.
+
+TABLES : bkpf, bsis.
+
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+*       go_container TYPE REF TO cl_gui_custom_container.
+       go_container TYPE REF TO cl_gui_docking_container.
+
+*-- For Popup
+DATA : go_pop_grid TYPE REF TO cl_gui_alv_grid,
+       go_pop_cont TYPE REF TO cl_gui_custom_container.
+*-- End of popup
+DATA : go_handler   TYPE REF TO lcl_event_handler.
+
+*DATA : BEGIN OF gs_bsis,
+*         gjahr  TYPE bsis-gjahr,
+*         belnr  TYPE bsis-belnr,
+*         budat  TYPE bsis-budat,
+*         blart  TYPE bsis-blart,
+*         gsber  TYPE bsis-gsber,
+*         gtext  TYPE tgsbt-gtext,
+*         col(4),
+*       END OF gs_bsis.
+
+DATA : BEGIN OF gs_bsis.
+    INCLUDE STRUCTURE bsis.
+DATA : text TYPE tgsbt-gtext,
+       END OF gs_bsis,
+
+       gs_tgsbt TYPE tgsbt.
+
+
+DATA : gt_bsis  LIKE TABLE OF gs_bsis,
+       gt_tgsbt LIKE TABLE OF gs_tgsbt.
+
+*-- For popup ALV
+DATA : gt_bseg TYPE TABLE OF bseg,
+       gs_bseg TYPE bseg.
+
+DATA : gt_pop_fcat   TYPE lvc_t_fcat,
+       gs_pop_fcat   TYPE lvc_s_fcat,
+       gs_pop_layout TYPE lvc_s_layo.
+*-- End of popup
+
+DATA : gt_fcat   TYPE lvc_t_fcat,
+       gs_fcat   TYPE lvc_s_fcat,
+       gt_sort   TYPE lvc_t_sort,
+       gs_sort   TYPE lvc_s_sort,
+       gs_layout TYPE lvc_s_layo.
+
+DATA : gv_okcode TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

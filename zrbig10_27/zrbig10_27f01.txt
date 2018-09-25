@@ -1,0 +1,280 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_27F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_bukrs   = 1000.
+  p_gjahr   = sy-datum.
+
+  s_blart-sign    = 'I'.
+  s_blart-option  = 'EQ'.
+  s_blart-low     = 'RE'.
+  APPEND s_blart.
+  CLEAR s_blart.
+
+  s_blart-sign    = 'I'.
+  s_blart-option  = 'EQ'.
+  s_blart-low     = 'KR'.
+  APPEND s_blart.
+  CLEAR s_blart.
+
+  s_monat-sign    = 'I'.
+  s_monat-option  = 'BT'.
+  s_monat-low     = 6.
+  s_monat-high    = sy-datum+4(2).
+  APPEND s_monat.
+  CLEAR s_monat.
+
+  s_budat-sign    = 'I'.
+  s_budat-option  = 'BT'.
+  s_budat-low     = '20180601'.
+  s_budat-high    = sy-datum.
+  APPEND s_budat.
+  CLEAR s_budat.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  DATA : lt_body LIKE TABLE OF gs_body,
+         ls_body LIKE gs_body.
+
+  CLEAR : gt_body, gs_body.
+
+  SELECT a~gjahr a~belnr glvor shkzg lifnr dmbtr a~waers
+    INTO CORRESPONDING FIELDS OF TABLE gt_body
+    FROM bkpf AS a INNER JOIN bsik AS b
+    ON  a~bukrs EQ b~bukrs
+    AND a~gjahr EQ b~gjahr
+    AND a~belnr EQ b~belnr
+
+    WHERE a~bukrs EQ p_bukrs
+    AND   a~gjahr EQ p_gjahr
+    AND   a~blart IN s_blart
+    AND   a~monat IN s_monat
+    AND   a~budat IN s_budat.
+
+  IF gt_body IS NOT INITIAL.
+
+    CLEAR lt_body.
+
+    lt_body = gt_body.
+
+    SORT lt_body BY lifnr ASCENDING.
+
+    DELETE ADJACENT DUPLICATES FROM lt_body COMPARING lifnr.
+
+    CLEAR : gt_lfa1, gs_lfa1.
+
+    SELECT *
+      INTO CORRESPONDING FIELDS OF TABLE gt_lfa1
+      FROM lfa1
+      FOR ALL ENTRIES IN lt_body
+      WHERE lifnr EQ lt_body-lifnr.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_data .
+
+  DATA : lv_tabix TYPE sy-tabix.
+
+  SORT gt_lfa1 BY lifnr.
+
+  LOOP AT gt_body INTO gs_body.
+
+    lv_tabix = sy-tabix.
+
+    CLEAR gs_lfa1.
+    READ TABLE gt_lfa1 INTO gs_lfa1 WITH KEY lifnr = gs_body-lifnr
+                                    BINARY SEARCH.
+
+    gs_body-name1  = gs_lfa1-name1.
+
+    MODIFY gt_body FROM gs_body INDEX lv_tabix TRANSPORTING name1.
+
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_screen .
+
+  PERFORM set_layout.
+
+  CLEAR : gt_fcat, gs_fcat.
+
+  PERFORM set_field_catalog USING:
+        "PK   field     coltxt            emphasize
+        'X'   'GJAHR'   'Fiscal year'     ' ',
+        'X'   'BELNR'   'Document no'     ' ',
+        ' '   'GLVOR'   'Business tran'   ' ',
+        ' '   'SHKZG'   'D/C Indicator'   ' ',
+        ' '   'LIFNR'   'Vendor'          ' ',
+        ' '   'NAME1'   'Name'            'X',
+        ' '   'DMBTR'   'Amount'          ' ',
+        ' '   'WAERS'   'Currency'        ' '.
+
+  IF go_container IS INITIAL.
+    PERFORM create_object.
+
+    SET HANDLER : go_handler->on_double_click   FOR go_alv_grid,
+                  lcl_event_handler=>on_hotspot FOR go_alv_grid.
+
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_layout
+      CHANGING
+        it_outtab                     = gt_body
+        it_fieldcatalog               = gt_fcat
+        it_sort                       = gt_sort
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+  gs_layout-zebra       = 'X'.
+  gs_layout-sel_mode    = 'D'.
+  gs_layout-cwidth_opt  = 'X'.
+  gs_layout-totals_bef  = 'X'.
+
+  CLEAR : gt_sort, gs_sort.
+  gs_sort-fieldname = 'LIFNR'.
+  gs_sort-spos      = 1.
+  gs_sort-subtot    = 'X'.
+
+  APPEND gs_sort TO gt_sort.
+  CLEAR : gs_sort.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0229   text
+*      -->P_0230   text
+*      -->P_0231   text
+*      -->P_0232   text
+*----------------------------------------------------------------------*
+FORM set_field_catalog  USING pv_key pv_fname pv_text pv_emphasize.
+
+  gs_fcat-key       = pv_key.
+  gs_fcat-fieldname = pv_fname.
+  gs_fcat-coltext   = pv_text.
+  gs_fcat-emphasize = pv_emphasize.
+
+  CASE pv_fname.
+*    WHEN 'GJAHR' OR 'SHKZG' OR 'WAERS'.
+*      gs_fcat-just = 'c'.
+    WHEN 'DMBTR'.
+      gs_fcat-cfieldname = 'WAERS'.
+      gs_fcat-do_sum     = 'X'.
+    WHEN 'BELNR'.
+      gs_fcat-hotspot = 'X'.
+  ENDCASE.
+
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR gs_fcat.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+  CREATE OBJECT go_container
+    EXPORTING
+      repid     = sy-repid
+      dynnr     = sy-dynnr
+      side      = go_container->dock_at_left
+      extension = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+
+  CREATE OBJECT go_handler.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ON_DOUBLE_CLICK
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_E_ROW  text
+*      -->P_E_COLUMN  text
+*----------------------------------------------------------------------*
+FORM on_double_click  USING pv_row pv_column.
+  MESSAGE i001(k5) WITH 'ROW : ' pv_row 'COLUMN : ' pv_column.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ON_HOTSPOT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_E_ROW_ID  text
+*      -->P_E_COLUMN_ID  text
+*----------------------------------------------------------------------*
+FORM on_hotspot  USING pv_row_id pv_column_id.
+
+  CLEAR gs_body.
+  READ TABLE gt_body INTO gs_body INDEX pv_row_id.
+
+  SET PARAMETER ID 'BLN' FIELD gs_body-belnr.
+  SET PARAMETER ID 'BUK' FIELD p_bukrs.
+  SET PARAMETER ID 'GJR' FIELD gs_body-gjahr.
+
+  CALL TRANSACTION 'FB03' AND SKIP FIRST SCREEN.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

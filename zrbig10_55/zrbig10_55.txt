@@ -1,0 +1,45 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG00_33
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE ZRBIG10_55TOP.
+*INCLUDE zrbig00_33top                           .    " global Data
+
+INCLUDE ZRBIG10_55S01.
+*INCLUDE zrbig00_33s01                           .  " Selection screen
+INCLUDE ZRBIG10_55O01.
+*INCLUDE zrbig00_33o01                           .  " PBO-Modules
+INCLUDE ZRBIG10_55I01.
+*INCLUDE zrbig00_33i01                           .  " PAI-Modules
+INCLUDE ZRBIG10_55F01.
+*INCLUDE zrbig00_33f01                           .  " FORM-Routines
+
+
+**********************************************************************
+* START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+  PERFORM get_data.
+
+  CALL SCREEN 100.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> [BD] Edit ALV sample
+
+*Text elements
+*----------------------------------------------------------
+* T01 Choice
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_EDIT         Edit
+* P_READ         Read
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

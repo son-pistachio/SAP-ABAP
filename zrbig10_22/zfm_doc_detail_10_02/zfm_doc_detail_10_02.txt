@@ -1,0 +1,21 @@
+FUNCTION zfm_doc_detail_10_02.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(I_BUKRS) TYPE  BSEG-BUKRS
+*"     REFERENCE(I_BELNR) TYPE  BSEG-BELNR
+*"     REFERENCE(I_GJAHR) TYPE  BSEG-GJAHR
+*"  EXPORTING
+*"     REFERENCE(E_SUBRC) TYPE  SY-SUBRC
+*"  TABLES
+*"      T_BSEG STRUCTURE  BSEG
+*"----------------------------------------------------------------------
+
+  PERFORM get_bseg_data TABLES t_bseg
+                        USING i_bukrs i_belnr i_gjahr
+                        e_subrc.
+
+ENDFUNCTION.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

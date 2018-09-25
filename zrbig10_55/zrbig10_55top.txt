@@ -1,0 +1,36 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG00_33TOP                                     Report ZRBIG00_33
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig00_33.
+
+**********************************************************************
+* Class instance
+**********************************************************************
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+       go_container TYPE REF TO cl_gui_docking_container.
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : BEGIN OF gs_body,
+        bukrs TYPE t001-bukrs,
+        gjahr TYPE bkpf-gjahr,
+        saknr TYPE ska1-saknr,
+        dmbtr TYPE bseg-dmbtr,
+        waers TYPE bkpf-waers,
+       END OF gs_body.
+
+DATA : gt_body    LIKE TABLE OF gs_body.
+
+DATA : gt_fcat    TYPE lvc_t_fcat,
+       gs_fcat    TYPE LINE OF lvc_t_fcat,
+       gs_layout  TYPE lvc_s_layo.
+
+**********************************************************************
+* Common variable
+**********************************************************************
+DATA : gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

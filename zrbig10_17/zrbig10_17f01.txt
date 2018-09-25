@@ -1,0 +1,213 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_17F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid    = 'QF'.
+
+  s_id-sign   = 'I'.
+  s_id-option = 'BT'.
+  s_id-low    = '1'.
+  s_id-high   = '500'.
+  APPEND s_id.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CHECK-PARAM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM check-param .
+  CASE 'X'.
+    WHEN p_tick.
+      DATA : ls_sticket   TYPE sticket.
+
+      CHECK s_connid IS NOT INITIAL.
+
+      CLEAR ls_sticket.
+      SELECT SINGLE *
+        INTO CORRESPONDING FIELDS OF ls_sticket
+        FROM sticket
+        WHERE carrid EQ p_carrid
+        AND   connid IN s_connid.
+
+      IF ls_sticket IS INITIAL.
+        MESSAGE s001(k5)  WITH TEXT-e01 DISPLAY LIKE 'E'.
+        STOP.
+
+      ENDIF.
+
+    WHEN p_cust.
+      DATA : ls_scust   TYPE scustom.
+
+      CHECK s_id  IS NOT INITIAL.
+
+      CLEAR ls_scust.
+
+      SELECT SINGLE *
+        INTO CORRESPONDING FIELDS OF ls_scust
+        FROM scustom
+        WHERE id     EQ s_id.
+
+      IF ls_scust IS INITIAL.
+        MESSAGE s001(k5) WITH TEXT-e01  DISPLAY LIKE 'E'.
+        STOP.
+
+      ENDIF.
+
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MODIFY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM modify_screen .
+
+  LOOP AT SCREEN.
+    CASE 'X'.
+      WHEN p_tick.
+        IF screen-group1 = 'CON'.
+          screen-input = 0.
+        ELSEIF screen-group1 = 'ID'.
+          screen-input = 1.
+        ENDIF.
+
+      WHEN p_cust.
+        IF screen-group1 = 'CON'.
+          screen-input = 1.
+        ELSEIF screen-group1 = 'ID'.
+          screen-input = 0.
+        ENDIF.
+
+    ENDCASE.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+  CASE 'X'.
+    WHEN p_tick.
+      CLEAR : gt_sticket, gs_sticket.
+      SELECT *
+        INTO CORRESPONDING FIELDS OF TABLE gt_sticket
+        FROM sticket
+        WHERE carrid EQ p_carrid
+        AND   customid IN s_id.
+
+    WHEN p_cust.
+      CLEAR : gt_scustom, gs_scustom.
+      SELECT *
+        INTO CORRESPONDING FIELDS OF TABLE gt_scustom
+        FROM scustom
+        WHERE id IN s_id.
+  ENDCASE.
+
+  IF sy-subrc EQ 0.
+    MESSAGE s001(k5) WITH TEXT-s01 sy-dbcnt.
+    ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  INIT_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM init_screen .
+  PERFORM set_layout.
+
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+    CASE 'X'.
+      WHEN p_tick.
+        CALL METHOD go_alv_grid->set_table_for_first_display
+          EXPORTING
+            i_structure_name = 'STICKET'
+            i_save           = 'A'
+            i_default        = 'X'
+            is_layout        = gs_layout
+          CHANGING
+            it_outtab        = gt_sticket.
+
+      WHEN p_cust.
+        CALL METHOD go_alv_grid->set_table_for_first_display
+          EXPORTING
+            i_structure_name = 'SCUSTOM'
+            i_save           = 'A'
+            i_default        = 'X'
+            is_layout        = gs_layout
+          CHANGING
+            it_outtab        = gt_scustom.
+
+    ENDCASE.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+  gs_layout-zebra       = 'X'.
+  gs_layout-cwidth_opt  = 'X'.
+  gs_layout-sel_mode    = 'D'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+*  CREATE OBJECT go_container
+*    EXPORTING
+*      container_name = 'GO_CONT'.
+CREATE OBJECT go_container
+  EXPORTING
+    repid                       = sy-repid
+    dynnr                       = sy-dynnr
+    side                        = go_container->DOCK_AT_LEFT
+    extension                   = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

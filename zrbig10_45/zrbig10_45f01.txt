@@ -1,0 +1,410 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_45F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_bukrs = 1000.
+  p_gjahr = sy-datum(4).
+
+  s_blart-sign    = 'I'.
+  s_blart-option  = 'EQ'.
+  s_blart-low     = 'RV'.
+  APPEND s_blart.
+  CLEAR  s_blart.
+
+  s_blart-sign    = 'I'.
+  s_blart-option  = 'EQ'.
+  s_blart-low     = 'DZ'.
+  APPEND s_blart.
+  CLEAR  s_blart.
+
+  s_monat-sign    = 'I'.
+  s_monat-option  = 'BT'.
+  s_monat-low     = '6'.
+  s_monat-high    = sy-datum+4(2).
+  APPEND s_monat.
+  CLEAR  s_monat.
+
+  s_budat-sign    = 'I'.
+  s_budat-option  = 'BT'.
+  s_budat-low     = '20180601'.
+  s_budat-high    = sy-datum.
+  APPEND s_budat.
+  CLEAR  s_budat.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  DATA : lt_bsid LIKE gt_bsid.
+
+*-- Get BKPF DATA
+  CLEAR gt_bkpf.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_bkpf
+    FROM bkpf
+    WHERE bukrs EQ p_bukrs
+    AND   gjahr EQ p_gjahr
+    AND   blart IN s_blart
+    AND   monat IN s_monat
+    AND   budat IN s_budat.
+
+*-- Get BSID DATA
+  CLEAR : gt_bsid.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_bsid
+    FROM bsid
+    WHERE bukrs EQ p_bukrs
+    AND   gjahr EQ p_gjahr
+    AND   blart IN s_blart
+    AND   monat IN s_monat
+    AND   budat IN s_budat.
+
+*-- Get NAME1 DATA
+  IF gt_bsid IS NOT INITIAL.
+
+    lt_bsid = gt_bsid.
+
+    SORT lt_bsid BY kunnr ASCENDING.
+    DELETE ADJACENT DUPLICATES FROM lt_bsid COMPARING kunnr.
+
+    CLEAR : gt_kna1.
+
+    SELECT *
+      INTO CORRESPONDING FIELDS OF TABLE gt_kna1
+      FROM kna1
+      FOR ALL ENTRIES IN lt_bsid
+      WHERE kunnr EQ lt_bsid-kunnr.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_data .
+
+*  DATA : lv_tabix TYPE sy-tabix.
+
+  SORT gt_kna1 BY kunnr.
+
+  CLEAR : gs_bkpf, gt_body.
+  LOOP AT gt_bkpf INTO gs_bkpf.
+
+    CLEAR : gs_bsid.
+    LOOP AT gt_bsid INTO gs_bsid WHERE bukrs EQ gs_bkpf-bukrs
+                                  AND  belnr EQ gs_bkpf-belnr
+                                  AND  gjahr EQ gs_bkpf-gjahr.
+
+      CLEAR : gs_body.
+      MOVE-CORRESPONDING : gs_bkpf TO gs_body,
+                           gs_bsid TO gs_body.
+
+*      lv_tabix = sy-tabix.
+
+      CLEAR : gs_kna1.
+      READ TABLE gt_kna1 INTO gs_kna1 WITH KEY kunnr = gs_body-kunnr    " with key # sort# by# #####.
+      BINARY SEARCH.
+
+        gs_body-name1 = gs_kna1-name1.
+*      IF sy-subrc EQ 0.
+*      ENDIF.
+
+*      MODIFY gt_body FROM gs_body INDEX lv_tabix TRANSPORTING kunnr.
+
+      APPEND gs_body TO gt_body.
+      CLEAR gs_body.
+
+    ENDLOOP.
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SCREEN100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_screen100 .
+
+  PERFORM set_layout.
+
+  CLEAR : gs_fcat, gt_fcat.
+  PERFORM set_field_catalog USING:
+        "pk field   coltxt          emphasize
+        'X' 'GJAHR' 'Fiscal year'   ' ',
+        'X' 'BELNR' 'Document No'   ' ',
+        ' ' 'XBLNR' 'Ref doc No'    ' ',
+        ' ' 'BSCHL' 'Posting Key'   ' ',
+        ' ' 'KUNNR' 'Customer'      ' ',
+        ' ' 'NAME1' 'Name'          'X',
+        ' ' 'DMBTR' 'Amount'        ' ',
+        ' ' 'WAERS' 'Currency'      ' '.
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+
+    SET HANDLER : lcl_event_handler=>on_double_click FOR go_alv_grid,
+                  lcl_event_handler=>on_hotspot_click FOR go_alv_grid.
+
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_layout
+      CHANGING
+        it_outtab                     = gt_body
+        it_fieldcatalog               = gt_fcat
+        it_sort                       = gt_sort
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+  CLEAR : gs_layout.
+  gs_layout-zebra       = 'X'.
+  gs_layout-sel_mode    = 'D'.
+  gs_layout-cwidth_opt  = 'X'.
+  gs_layout-totals_bef  = 'X'.
+
+  CLEAR : gs_sort, gt_sort.
+  gs_sort-fieldname = 'KUNNR'.
+  gs_sort-spos      = 1.
+  gs_sort-subtot    = 'X'.
+  APPEND gs_sort TO gt_sort.
+  CLEAR gs_sort.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0216   text
+*      -->P_0217   text
+*      -->P_0218   text
+*      -->P_0219   text
+*----------------------------------------------------------------------*
+FORM set_field_catalog  USING pv_key pv_field pv_text pv_emphasize.
+
+  gs_fcat-key       = pv_key.
+  gs_fcat-fieldname = pv_field.
+  gs_fcat-coltext   = pv_text.
+  gs_fcat-emphasize = pv_emphasize.
+
+  CASE pv_field.
+    WHEN 'DMBTR'.
+      gs_fcat-cfieldname = 'WAERS'.
+      gs_fcat-do_sum     = 'X'.
+    WHEN 'BELNR'.
+      gs_fcat-hotspot = 'X'.
+    WHEN 'GJAHR' OR 'BSCHL' OR 'WAERS'.
+      gs_fcat-just = 'C'.
+  ENDCASE.
+
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR  gs_fcat.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+
+  CREATE OBJECT go_container
+    EXPORTING
+      repid     = sy-repid
+      dynnr     = sy-dynnr
+      side      = go_container->dock_at_left
+      extension = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DOUBLE_CLICK
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_E_ROW  text
+*----------------------------------------------------------------------*
+FORM double_click  USING    pv_row.
+
+  DATA : lv_subrc TYPE sy-subrc.
+
+  CLEAR : gs_body.
+  READ TABLE gt_body INTO gs_body INDEX pv_row.
+
+  CLEAR : gt_bseg.
+  CALL FUNCTION 'ZFM_DOC_DETAIL10_02'
+    EXPORTING
+      i_bukrs = p_bukrs
+      i_belnr = gs_body-belnr
+      i_gjahr = p_gjahr
+    IMPORTING
+      e_subrc = lv_subrc
+    TABLES
+      t_bseg  = gt_bseg.
+
+  IF lv_subrc EQ 0.
+    CALL SCREEN 110 STARTING AT 03 03.
+  ELSE.
+    EXIT.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  HOTSPOT_CLICK
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_E_ROW_ID  text
+*----------------------------------------------------------------------*
+FORM hotspot_click  USING    pv_row_id.
+
+  CLEAR : gs_body.
+  READ TABLE gt_body INTO gs_body INDEX pv_row_id.
+
+  SET PARAMETER ID 'BLN' FIELD gs_body-belnr.
+  SET PARAMETER ID 'BUK' FIELD p_bukrs.
+  SET PARAMETER ID 'GJR' FIELD p_gjahr.
+
+  CALL TRANSACTION 'FB03' AND SKIP FIRST SCREEN.
+
+endform.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SCREEN110
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_screen110 .
+  PERFORM set_pop_layout.
+
+  CLEAR : gt_pop_fcat, gs_pop_fcat.
+  PERFORM set_pop_fcat USING :
+        "PK "FILED    'COLTXT         "EMPHA
+        'X' 'BUKRS'   'Company'       ' ',
+        'X' 'BELNR'   'Document No'   ' ',
+        'X' 'GJAHR'   'Fiscal year'   ' ',
+        ' ' 'DMBTR'   'Amount'        ' '.
+
+  IF go_pop_cont IS INITIAL.
+    PERFORM create_pop_object.
+
+    CALL METHOD go_pop_grid->set_table_for_first_display
+      EXPORTING
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_pop_layo
+      CHANGING
+        it_outtab                     = gt_bseg
+        it_fieldcatalog               = gt_pop_fcat
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+
+  ELSE.
+    CALL METHOD go_pop_grid->refresh_table_display.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_POP_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_pop_layout .
+  CLEAR : gs_pop_layo.
+  gs_pop_layo-zebra       = 'X'.
+  gs_pop_layo-sel_mode    = 'D'.
+  gs_pop_layo-cwidth_opt  = 'X'.
+  gs_pop_layo-no_toolbar  = 'X'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_POP_FCAT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0562   text
+*      -->P_0563   text
+*      -->P_0564   text
+*      -->P_0565   text
+*----------------------------------------------------------------------*
+FORM set_pop_fcat  USING  pv_key pv_field pv_text pv_emphasize.
+  gs_pop_fcat-key       = pv_key.
+  gs_pop_fcat-fieldname = pv_field.
+  gs_pop_fcat-coltext   = pv_text.
+  gs_pop_fcat-emphasize = pv_emphasize.
+  APPEND gs_pop_fcat TO gt_pop_fcat.
+  CLEAR  gs_pop_fcat.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_POP_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_pop_object .
+  CREATE OBJECT go_pop_cont
+    EXPORTING
+      container_name = 'GO_CONT'.
+
+  CREATE OBJECT go_pop_grid
+    EXPORTING
+      i_parent = go_pop_cont.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

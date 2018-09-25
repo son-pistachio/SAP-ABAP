@@ -1,0 +1,57 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_30
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_30top                           .    " global Data
+
+INCLUDE zrbig10_30s01                           .  " Selection Screen
+INCLUDE zrbig10_30c01                           .  " AVL Event
+INCLUDE zrbig10_30o01                           .  " PBO-Modules
+INCLUDE zrbig10_30i01                           .  " PAI-Modules
+INCLUDE zrbig10_30f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> AR OPEN ITEM LIST
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BUKRS         Company
+* P_GJAHR         Fiscal year
+* S_BLART         Document type
+* S_BUDAT         Posting date
+* S_MONAT         Fiscal period
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+*102   Data has been saved
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

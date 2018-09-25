@@ -1,0 +1,64 @@
+*&---------------------------------------------------------------------*
+*& Report ZRBIG10_01
+*&---------------------------------------------------------------------*
+
+REPORT zrbig10_01 LINE-SIZE 300.
+
+INCLUDE zrbig10_01_top.   " Global data definition
+INCLUDE zsbig10_01_s01.   " Selection screen
+INCLUDE zrbig10_01_f01.   " Form routine (a.k.a subroutine)
+
+**********************************************************************
+* INITIALIZATION : Set default value
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.               "perform# ##### ## ### ### ### ##.
+
+**********************************************************************
+* AT SELECTION-SCREEN : Validation & Authority check
+**********************************************************************
+AT SELECTION-SCREEN.
+  PERFORM check_validation.
+
+
+**********************************************************************
+* START-OF-SELECTION : Logic start
+**********************************************************************
+START-OF-SELECTION.
+  PERFORM get_scarr_data.
+  PERFORM display_data.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Airline
+* T02 Favorite
+* T03 Hobby
+* T04 Gender
+* T05 Student Number
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_CARR         Airline Code
+* P_CARRID         Airline Code
+* P_CHECK1         Korea Food
+* P_CHECK2         American Food
+* P_HAKBUN         Num.
+* P_RA1         Male
+* P_RA2         Female
+* P_RB1         Motor cycle
+* P_RB2         Airplane
+* P_RB3         ship
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: Hard coded
+*   Error!!!
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

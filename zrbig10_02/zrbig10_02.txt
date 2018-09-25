@@ -1,0 +1,73 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_02
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE ZRBIG10_02TOP                           .    " global Data
+
+INCLUDE ZRBIG10_02S01                           .  " Selection Screen
+INCLUDE ZRBIG10_02F01                           .  " FORM-Routines
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+*  AT SELECTION-SCREEN
+**********************************************************************
+AT SELECTION-SCREEN.
+  PERFORM button_action.
+
+
+**********************************************************************
+*  AT SELECTION-SCREEN OUTPUT
+**********************************************************************
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM modify_screen.
+
+
+**********************************************************************
+* START OF SELECTION
+**********************************************************************
+START-OF-SELECTION.
+*  PERFORM control_test.   " Control statement
+*  PERFORM repeat_test.   " Repeat statement
+   PERFORM get_data.
+   PERFORM display_data.
+
+*Text elements
+*----------------------------------------------------------
+* I01 Success
+* I02 PASS TEST
+* T01 Condition
+* T02 Action
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_AIR         Airline
+* P_CARRID         Airline
+* P_CURR         Currency
+* P_FLDATE         Flight date
+* S_CITY         City from
+* S_CONNID         Connection
+* S_FLDATE         Flight date
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: Hard coded
+*   America airline
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

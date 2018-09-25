@@ -1,0 +1,62 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_16
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_16top                           .    " global Data
+
+INCLUDE zrbig10_16s01                           .  " Selection Screen
+INCLUDE zrbig10_16o01                           .  " PBO-Modules
+INCLUDE zrbig10_16i01                           .  " PAI-Modules
+INCLUDE zrbig10_16f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+AT SELECTION-SCREEN.
+  PERFORM check-param.
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM modify_screen.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+
+  IF gt_sflight IS INITIAL AND gt_sbook IS INITIAL.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+  ELSE.
+    CALL SCREEN 100.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> TITLE100
+
+*Text elements
+*----------------------------------------------------------
+* E01 ERROR
+* S01 DATA NUM =
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_AIR         SFLIGHT
+* P_BOOK         SBOOK
+* P_CARRID         Airline
+* S_CONNID         Connetion
+* S_FLDATE         Flight Date
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

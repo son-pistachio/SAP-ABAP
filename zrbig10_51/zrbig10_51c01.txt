@@ -1,0 +1,60 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_51C01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&       Class LCL_EVENT_HANDLER
+*&---------------------------------------------------------------------*
+*        Text
+*----------------------------------------------------------------------*
+CLASS lcl_event_handler DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS on_double_click FOR EVENT double_click
+    OF cl_gui_alv_grid IMPORTING e_row.
+ENDCLASS.
+*&---------------------------------------------------------------------*
+*&       Class (Implementation)  LCL_EVENT_HANDLER
+*&---------------------------------------------------------------------*
+*        Text
+*----------------------------------------------------------------------*
+CLASS lcl_event_handler IMPLEMENTATION.
+  METHOD on_double_click.
+    PERFORM double_click USING e_row.
+  ENDMETHOD.
+ENDCLASS.               "LCL_EVENT_HANDLER
+*&---------------------------------------------------------------------*
+*&      Form  DOUBLE_CLICK
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_E_ROW  text
+*----------------------------------------------------------------------*
+FORM double_click  USING    pv_row.
+  DATA : lv_subrc TYPE sy-subrc.
+
+*-- Get ekpo data to call func. module
+  CLEAR : gs_body.
+  READ TABLE gt_body INTO gs_body INDEX pv_row.
+
+  CLEAR : gt_afpo.
+
+  CALL FUNCTION 'ZFM_DOC_DETAIL10_05'
+    EXPORTING
+      i_aufnr = gs_body-aufnr
+    IMPORTING
+      e_subrc = lv_subrc
+    TABLES
+      t_afpo  = gt_afpo.
+
+  IF lv_subrc EQ 0.
+    PERFORM get_name1_data.
+    PERFORM display_name1_data.
+    CALL SCREEN 110 STARTING AT 03 03.
+  ELSE.
+    EXIT.
+  ENDIF.
+
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

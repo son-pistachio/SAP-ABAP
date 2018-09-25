@@ -1,0 +1,39 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_16TOP                                     Report ZRBIG10_16
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRBIG10_16.
+
+TABLES : sflight, sbook.
+
+DATA : go_alv_grid    TYPE REF TO cl_gui_alv_grid,
+*       go_container   TYPE REF TO cl_gui_custom_container.
+       go_container   TYPE REF TO cl_gui_docking_container.
+" ### ## ## #### # 180702-------------------------------
+*DATA : gt_sflight   TYPE TABLE OF sflight,
+*       gs_sflight   TYPE sflight,
+*       gt_sbook     TYPE TABLE OF sbook,
+*       gs_sbook     TYPE sbook.
+
+DATA : BEGIN OF gs_sflight.
+        INCLUDE STRUCTURE sflight.
+DATA : col(4),  " For color code
+       END OF gs_sflight.
+
+DATA : BEGIN OF gs_sbook.
+        INCLUDE STRUCTURE sbook.
+DATA : pic  TYPE icon-id,
+        END OF gs_sbook.
+
+DATA : gt_sflight LIKE TABLE OF gs_sflight.
+DATA : gt_sbook   LIKE TABLE OF gs_sbook.
+
+*--------------------------------------------------------------------*
+DATA : gt_fcat   TYPE lvc_t_fcat,
+       gs_fcat   TYPE lvc_s_fcat,
+       gs_layout TYPE lvc_s_layo.
+
+DATA : gv_okcode  TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

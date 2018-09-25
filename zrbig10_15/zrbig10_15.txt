@@ -1,0 +1,71 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_15
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_15top                           .    " global Data
+
+INCLUDE zrbig10_15s01                           .  " Selection Screen
+INCLUDE zrbig10_15o01                           .  " PBO-Modules
+INCLUDE zrbig10_15i01                           .  " PAI-Modules
+INCLUDE zrbig10_15f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+AT SELECTION-SCREEN.
+  PERFORM check-param.
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM modify_screen.
+
+START-OF-SELECTION.
+  CASE 'X'.
+    WHEN p_air.
+      PERFORM get_airline_data.
+    WHEN p_book.
+      PERFORM get_sbook_data.
+  ENDCASE.
+
+  IF gt_sflight IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSEIF gt_sbook IS NOT INITIAL.
+    CALL SCREEN 200.
+  ELSE.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> SFLIGHT
+* TITLE200 --> SBOOK
+
+*Text elements
+*----------------------------------------------------------
+* E01 ERROR
+* T01 Condition
+* T02 Choice
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_AIR         SFLIGHT
+* P_BOOK         SBOOK
+* P_CARRID         Airline
+* S_CONNID         Connection
+* S_FLDATE         Flight date
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

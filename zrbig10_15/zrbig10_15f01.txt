@@ -1,0 +1,243 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_15F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid  = 'LH'.
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CHECK-PARAM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM check-param .
+
+  CASE 'X'.
+    WHEN p_air.
+
+      DATA : ls_sflight   TYPE sflight.
+
+      CHECK s_connid IS NOT INITIAL.
+
+      CLEAR ls_sflight.
+      SELECT SINGLE *
+        INTO CORRESPONDING FIELDS OF ls_sflight
+        FROM sflight
+        WHERE carrid EQ p_carrid
+        AND   connid EQ s_connid-low
+        AND   fldate EQ s_fldate-low.
+
+      IF ls_sflight IS INITIAL.
+        MESSAGE s001(k5) WITH TEXT-e01 DISPLAY LIKE 'E'.
+        STOP.
+
+      ENDIF.
+
+    WHEN p_book.
+      DATA : ls_sbook   TYPE sbook.
+
+      CHECK s_fldate-low IS NOT INITIAL.
+
+      SELECT SINGLE *
+        INTO CORRESPONDING FIELDS OF ls_sbook
+        FROM sbook
+        WHERE carrid EQ p_carrid
+        AND   connid EQ s_connid-low.
+
+      IF ls_sbook IS INITIAL.
+        MESSAGE s001(k5) WITH TEXT-e01 DISPLAY LIKE 'E'.
+        STOP.
+
+      ENDIF.
+
+  ENDCASE.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MODIFY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM modify_screen .
+*  LOOP AT SCREEN.
+*
+*    CASE 'X'.
+*      WHEN p_air.
+*        IF screen-group1  = 'CAR'.
+*          screen-input    = 0.
+*        ENDIF.
+*
+*    ENDCASE.
+*
+*    MODIFY SCREEN.
+*
+*  ENDLOOP.
+
+  LOOP AT SCREEN.
+
+    CASE 'X'.
+      WHEN p_air.
+        IF screen-group1 = 'CON' .
+          screen-input  = 0.
+        ELSEIF screen-group1 = 'FLD'.
+          screen-active = 1.
+        ENDIF.
+      WHEN p_book.
+        IF screen-group1 = 'FLD'.
+          screen-active  = 0.
+        ELSEIF screen-group1 = 'CON'.
+          screen-input = 1.
+        ENDIF.
+
+      WHEN OTHERS.
+    ENDCASE.
+
+    MODIFY SCREEN.
+
+  ENDLOOP.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_AIRLINE_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_airline_data .
+  CLEAR : gt_sflight, gs_sflight.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_sflight
+    FROM sflight
+    WHERE connid IN s_connid.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  INIT_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM init_screen .
+
+  PERFORM set_layout.
+
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name = 'SFLIGHT'
+        i_save           = 'A'
+        i_default        = 'X'
+        is_layout        = gs_layout
+      CHANGING
+        it_outtab        = gt_sflight.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+  gs_layout-zebra       = 'X'.
+  gs_layout-cwidth_opt  = 'X'.
+  gs_layout-sel_mode    = 'D'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+*  CREATE OBJECT go_container
+*    EXPORTING
+*      container_name = 'GO_CONT'.
+CREATE OBJECT go_container
+  EXPORTING
+    repid                       = sy-repid
+    dynnr                       = sy-dynnr
+    side                        = go_container->DOCK_AT_LEFT
+    extension                   = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  INIT_SCREEN_200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM init_screen_200 .
+  PERFORM set_layout.
+
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name = 'SBOOK'
+        i_save           = 'A'
+        i_default        = 'X'
+        is_layout        = gs_layout
+      CHANGING
+        it_outtab        = gt_sbook.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SBOOK_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_sbook_data .
+  CLEAR : gt_sbook, gs_sbook.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_sbook
+    FROM sbook
+    WHERE connid IN s_connid.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

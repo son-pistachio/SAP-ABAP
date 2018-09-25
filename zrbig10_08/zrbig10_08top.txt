@@ -1,0 +1,46 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_08TOP                                     Report ZRBIG10_08
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_08 LINE-SIZE 1000.
+
+
+**********************************************************************
+* TABLES
+**********************************************************************
+TABLES : scarr, spfli, sbook, sflight.
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : BEGIN OF gs_airline,
+         carrid   TYPE scarr-carrid,        " Airline code
+         connid   TYPE spfli-connid,        " Connection number
+         carrname TYPE scarr-carrname,        " Airline name
+         cityfrom TYPE spfli-cityfrom,
+         cityto   TYPE spfli-cityto,
+         url      TYPE scarr-url,
+       END OF gs_airline.
+
+DATA  gt_airline LIKE TABLE OF gs_airline.
+
+DATA : BEGIN OF gs_bookid,
+         carrid    TYPE scarr-carrid,        " Airline code
+         connid    TYPE spfli-connid,        " Connection number
+         fldate    TYPE sflight-fldate,
+         bookid    TYPE sbook-bookid,
+         price     TYPE sflight-price,
+         planetype TYPE sflight-planetype,
+         customid  TYPE sbook-customid,
+         wunit     TYPE sbook-wunit,
+         class     TYPE sbook-class,
+       END OF gs_bookid.
+
+DATA  gt_bookid  LIKE TABLE OF gs_bookid.
+
+**********************************************************************
+* Common variable
+**********************************************************************
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

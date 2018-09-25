@@ -1,0 +1,9 @@
+* regenerated at 2018.07.20 09:59:11
+FUNCTION-POOL ZFGBIG10_04                MESSAGE-ID SV.
+
+* INCLUDE LZFGBIG10_04D...                   " Local class definition
+  INCLUDE LSVIMDAT                                . "general data decl.
+  INCLUDE LZFGBIG10_04T00                         . "view rel. data dcl.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

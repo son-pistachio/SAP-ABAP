@@ -1,0 +1,269 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_09F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid = 'LH'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_BASE_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_base_data .
+  CLEAR : gt_airline, gs_airline.
+  SELECT a~carrid connid carrname cityfrom cityto url
+    INTO CORRESPONDING FIELDS OF TABLE gt_airline
+    FROM scarr AS a INNER JOIN spfli AS b
+    ON   a~carrid EQ b~carrid
+    WHERE a~carrid EQ p_carrid
+    AND   connid IN s_connid.
+
+  IF gt_airline IS INITIAL.
+    MESSAGE s037(k5)  DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_BASE_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_base_data .
+  LOOP AT gt_airline INTO gs_airline.
+    WRITE :/ gs_airline-carrid, gs_airline-connid, gs_airline-carrname,
+             gs_airline-cityfrom, gs_airline-cityto, gs_airline-url.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_BOOKING_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_booking_data .
+  CLEAR : gt_bookid, gs_bookid.
+  SELECT  a~carrid a~connid price planetype customid wunit
+    INTO CORRESPONDING FIELDS OF TABLE gt_bookid
+    FROM  sflight AS a INNER JOIN sbook AS b
+    ON    a~carrid EQ b~carrid
+    AND   a~connid EQ b~connid
+    AND   a~fldate EQ b~fldate
+    WHERE a~carrid EQ p_carrid
+    AND   a~connid IN s_connid.
+
+  IF gt_bookid IS INITIAL.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_BOOKING_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_booking_data .
+  LOOP AT gt_bookid INTO gs_bookid.
+    WRITE :/ gs_bookid-carrid, gs_bookid-connid, gs_bookid-price,
+             gs_bookid-planetype, gs_bookid-customid, gs_bookid-wunit.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_FAIR_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_fair_data .
+**********************************************************************
+* FOR ALL ENTRIES# ## ## ### ##
+**********************************************************************
+  CLEAR : gt_scarr, gt_scarr[].       "##### ## ##
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_scarr
+    FROM scarr
+    WHERE carrid IN s_carrid.
+
+*-- Initial check
+  IF gt_scarr[] IS INITIAL.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+
+*-- Sort by connection column : Step 2
+  SORT gt_scarr BY carrid ASCENDING.
+
+*-- Delete duplicate data
+  DELETE ADJACENT DUPLICATES FROM gt_scarr COMPARING carrid.    " ####
+
+*-- Data select by For all entries
+  CLEAR : gt_spfli, gt_spfli[].
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_spfli[]
+    FROM spfli
+    FOR ALL ENTRIES IN gt_scarr
+    WHERE carrid EQ gt_scarr-carrid   " Connection column
+    AND   connid IN s_connid.         " Search condition
+
+*-- Compose display data
+  CLEAR : gt_airline, gs_airline.
+  LOOP AT gt_scarr.
+
+    LOOP AT gt_spfli WHERE carrid EQ gt_scarr-carrid.         "work area# ## header line# ## #####.
+
+      gs_airline-carrid   = gt_spfli-carrid.
+      gs_airline-connid   = gt_spfli-connid.
+      gs_airline-carrname = gt_scarr-carrid.
+      gs_airline-cityfrom = gt_spfli-cityfrom.
+      gs_airline-cityto   = gt_spfli-cityto.
+      gs_airline-url      = gt_scarr-url.
+
+      APPEND gs_airline TO gt_airline.
+      CLEAR gs_airline.
+
+    ENDLOOP.
+
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_BOOK_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_book_data .
+  CLEAR : gt_sflight, gt_sflight[].
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_sflight[]
+    FROM sflight
+    WHERE carrid IN s_carrid
+    AND   connid IN s_connid.
+
+  IF gt_sflight[] IS INITIAL.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+
+  SORT gt_sflight BY carrid connid fldate ASCENDING.
+
+  DELETE ADJACENT DUPLICATES FROM gt_sflight COMPARING carrid connid fldate.
+
+  CLEAR : gt_sbook, gt_sbook[].
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_sbook[]
+    FROM sbook
+    FOR ALL ENTRIES IN gt_sflight
+    WHERE carrid EQ gt_sflight-carrid
+    AND   connid EQ gt_sflight-connid
+    AND   fldate EQ gt_sflight-fldate.
+
+  CLEAR : gt_bookid, gs_bookid.
+
+  LOOP AT gt_sflight.
+    LOOP AT gt_sbook WHERE carrid EQ gt_sflight-carrid
+                     AND   connid EQ gt_sflight-connid
+                     AND   fldate EQ gt_sflight-fldate.
+
+      gs_bookid-carrid     = gt_sflight-carrid.
+      gs_bookid-connid     = gt_sflight-connid.
+      gs_bookid-price      = gt_sflight-price.
+      gs_bookid-planetype  = gt_sflight-planetype.
+      gs_bookid-customid   = gt_sbook-customid.
+      gs_bookid-wunit      = gt_sbook-wunit.
+
+      APPEND gs_bookid TO gt_bookid.
+      CLEAR gs_bookid.
+
+    ENDLOOP.
+
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  VALUE_SUM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_1      text
+*      -->P_2      text
+*      <--P_GV_SUM  text
+*----------------------------------------------------------------------*
+FORM value_sum  USING pv_a        " Call by value
+                      pv_b
+                CHANGING pv_sum.  " Call by reference
+
+  pv_sum = pv_a + pv_b.
+
+  WRITE pv_sum.
+
+  IF pv_sum GT 2.
+    EXIT.
+  ENDIF.
+
+  PERFORM value_sum USING pv_a 3 CHANGING pv_sum.   "####. ####### ## ######.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SCARR
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_GS_AIRLINE_CARRID  text
+*      -->P_GS_AIRLINE_CONNID  text
+*----------------------------------------------------------------------*
+FORM display_scarr  USING pv_carrid
+                          pv_connid.
+
+  WRITE :/ pv_carrid, pv_connid.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_AIRLINE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_GT_AIRLINE  text
+*      -->P_1      text
+*      -->P_2      text
+*      <--P_GV_SUM  text
+*----------------------------------------------------------------------*
+FORM display_airline  TABLES   pt_airline STRUCTURE gs_airline      " pt = parameter table
+                                 " pt_airline# ##### ## internal table# #### ####.
+                      USING    pv_a pv_b
+                      CHANGING VALUE(pv_sum).
+
+*-- Internal table with headerline
+  LOOP AT pt_airline.           " #### ### into <structure> ## ### ##.
+
+    WRITE :/ pt_airline-carrid, pt_airline-connid, pt_airline-url.
+
+  ENDLOOP.
+
+  PERFORM value_sum USING pv_a pv_b CHANGING pv_sum.    " #### ### ## ### # ##.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

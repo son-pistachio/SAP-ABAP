@@ -1,0 +1,50 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_54
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_54top                           .    " global Data
+
+INCLUDE zrbig10_54s01                           .  " Selection Screen
+INCLUDE zrbig10_54c01                           .  " ALV Event
+INCLUDE zrbig10_54o01                           .  " PBO-Modules
+INCLUDE zrbig10_54i01                           .  " PAI-Modules
+INCLUDE zrbig10_54f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_base_data.
+  PERFORM get_text_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> PAYMENT LIST
+* TITLE110 --> POPUP SCREEN
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+*102   Data has been saved
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

@@ -1,0 +1,39 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_28
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_28top                           .    " global Data
+
+* INCLUDE ZRBIG10_28O01                           .  " PBO-Modules
+* INCLUDE ZRBIG10_28I01                           .  " PAI-Modules
+* INCLUDE ZRBIG10_28F01                           .  " FORM-Routines
+
+START-OF-SELECTION.
+
+*-- Get base data
+  CLEAR gt_scarr.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE gt_scarr
+    FROM scarr
+    WHERE carrid IN s_carrid.
+
+  IF sy-subrc EQ 0.
+*-- Export to ABAP Memory (Local Memory)
+    CLEAR gs_scarr.
+    READ TABLE gt_scarr INTO gs_scarr INDEX 2.
+    EXPORT
+      gs_scarr FROM gs_scarr
+      gt_scarr FROM gt_scarr
+      TO MEMORY ID 'B10'.
+
+*-- Goto target program
+    SUBMIT zrbig10_29 AND RETURN.
+
+  ENDIF.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

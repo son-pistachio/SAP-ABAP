@@ -1,0 +1,230 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_23F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_bukrs         = 1000.
+  p_gjahr         = sy-datum(4).
+  p_blart         = 'SA'.
+
+  s_monat-sign    = 'I'.
+  s_monat-option  = 'BT'.
+  s_monat-low     = '6'.
+  s_monat-high    = sy-datum+4(2).
+  APPEND s_monat.
+  CLEAR s_monat.
+
+  s_budat-sign    = 'I'.
+  s_budat-option  = 'EQ'.
+  s_budat-low     = '20180601'.
+  s_budat-high    = sy-datum.
+  APPEND s_budat.
+  CLEAR s_budat.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  DATA : lt_body  LIKE TABLE OF gs_body.
+
+  CLEAR : gt_body, gs_body.
+
+  SELECT a~gjahr a~belnr a~bktxt shkzg hkont dmbtr b~waers
+    INTO CORRESPONDING FIELDS OF TABLE gt_body
+    FROM bkpf AS a INNER JOIN bsis AS b
+    ON  a~bukrs EQ b~bukrs
+    AND a~belnr EQ b~belnr
+    AND a~gjahr EQ b~gjahr          " ##### pk# ## ### ## ###.
+
+    WHERE a~bukrs EQ p_bukrs        " #### #### ##### dbtable# ### ##.
+    AND   a~gjahr EQ p_gjahr
+    AND   a~blart EQ p_blart
+    AND   a~monat IN s_monat
+    AND   a~budat IN s_budat.
+
+  IF gt_body IS NOT INITIAL.
+
+    CLEAR lt_body.
+
+    lt_body = gt_body.
+
+    SORT lt_body BY hkont ASCENDING.
+
+    DELETE ADJACENT DUPLICATES FROM lt_body COMPARING hkont.
+
+    CLEAR : gs_skat, gt_skat.
+
+    SELECT *
+      INTO CORRESPONDING FIELDS OF TABLE gt_skat
+      FROM skat
+      FOR ALL ENTRIES IN lt_body
+      WHERE saknr EQ lt_body-hkont
+      AND   ktopl EQ 'INT'
+      AND   spras EQ sy-langu.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_data .
+
+  DATA : lv_tabix TYPE sy-tabix.              " ### ### #####
+
+  SORT gt_skat BY saknr.                      " #### #######.
+
+  LOOP AT gt_body INTO gs_body.
+
+    lv_tabix = sy-tabix.                "<- ##### ##.
+
+    CLEAR gs_skat.
+    READ TABLE gt_skat INTO gs_skat WITH KEY saknr = gs_body-hkont " sort# ### ### # ### ##. (BY saknr##)
+                                    BINARY SEARCH.
+
+      gs_body-txt50 = gs_skat-txt50.
+
+    MODIFY gt_body FROM gs_body INDEX lv_tabix TRANSPORTING txt50.
+
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_screen .
+
+  PERFORM set_layout.
+
+  CLEAR : gt_fcat, gs_fcat.
+  PERFORM set_field_catalog USING :
+        "PK   field       coltxt           emphasize
+        'X'   'GJAHR'     'Fiscal year'     ' ',
+        'X'   'BELNR'     'Document no'     ' ',
+        ' '   'BKTXT'     'Doc header'      ' ',
+        ' '   'SHKZG'     'D/C Indicator'   ' ',
+        ' '   'HKONT'     'G/L Account'     ' ',
+        ' '   'TEXT50'    'G/L Text'        'X',
+        ' '   'DMBTR'     'Amount'          ' ',
+        ' '   'WAERS'     'Currency'        ' '.
+
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_layout
+      CHANGING
+        it_outtab                     = gt_body
+        it_fieldcatalog               = gt_fcat
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+
+  ELSE.
+
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+
+  gs_layout-zebra       = 'X'.
+  gs_layout-sel_mode    = 'D'.
+  gs_layout-cwidth_opt  = 'X'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0196   text
+*      -->P_0197   text
+*      -->P_0198   text
+*      -->P_0199   text
+*----------------------------------------------------------------------*
+FORM set_field_catalog  USING pv_key pv_fname pv_text pv_emphasize.
+
+  gs_fcat-key         = pv_key.
+  gs_fcat-fieldname   = pv_fname.
+  gs_fcat-coltext     = pv_text.
+  gs_fcat-emphasize   = pv_emphasize.
+
+  CASE pv_fname.
+    WHEN 'GJAHR' OR 'SHKZG' OR 'WAERS'.
+      gs_fcat-just  = 'C'.
+  ENDCASE.
+
+*-- ### ## ##
+  CASE pv_fname.
+    WHEN 'DMBTR'.     " ######. wrntr - ####
+      gs_fcat-cfieldname = 'WAERS'.
+      " ### ### #### WAERS ####### Itab# ### ######.
+
+*      gs_fcat-currency = 'KRW'. " ##### ### #### ###.
+  ENDCASE.
+
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR gs_fcat.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+  CREATE OBJECT go_container
+    EXPORTING
+      repid     = sy-repid
+      dynnr     = sy-dynnr
+      side      = go_container->dock_at_left
+      extension = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

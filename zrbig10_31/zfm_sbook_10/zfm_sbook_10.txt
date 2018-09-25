@@ -1,0 +1,24 @@
+FUNCTION zfm_sbook_10.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(I_CARRID) TYPE  SBOOK-CARRID
+*"     REFERENCE(I_CONNID) TYPE  SBOOK-CONNID
+*"     REFERENCE(I_FLDATE) TYPE  SBOOK-FLDATE
+*"     REFERENCE(I_BOOKID) TYPE  SBOOK-BOOKID
+*"  EXPORTING
+*"     REFERENCE(E_SUBRC) TYPE  SY-SUBRC
+*"  TABLES
+*"      T_SBOOK STRUCTURE  SBOOK
+*"----------------------------------------------------------------------
+
+*-- Get Schedule Data
+  PERFORM get_sbook_data USING i_carrid i_connid i_fldate i_bookid
+                         CHANGING e_subrc.
+
+  t_sbook[] = gt_sbook.
+
+ENDFUNCTION.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

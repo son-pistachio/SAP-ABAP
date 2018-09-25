@@ -1,0 +1,32 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_37
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_37top                           .    " global Data
+
+INCLUDE zrbig10_37s01                           .  " Selection screen
+* INCLUDE ZRBIG10_37O01                           .  " PBO-Modules
+* INCLUDE ZRBIG10_37I01                           .  " PAI-Modules
+INCLUDE zrbig10_37f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_MONAT         Month
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

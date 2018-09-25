@@ -1,0 +1,331 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_02F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_carrid  = 'LH'.
+  p_curr    = 'EUR'.
+
+  s_fldate-sign   = 'I'.
+  s_fldate-option = 'BT'.
+  s_fldate-low    = sy-datum.
+  s_fldate-high   = sy-datum.
+  APPEND s_fldate.
+  CLEAR s_fldate.
+
+  s_connid-sign   = 'I'.
+  s_connid-option = 'BT'.
+  s_connid-low    = '17'.
+  s_connid-high   = '55'.
+  APPEND s_connid.
+  CLEAR s_connid.
+
+  s_city-sign   = 'I'.
+  s_city-option = 'EQ'.
+  s_city-low    = 'FRANKFURT'.
+  APPEND s_city.
+  CLEAR s_city.
+
+  gv_text = 'Button'.
+  gv_t01 = '###'.
+  gv_t02 = 'SCHOOL'.
+  gv_t03 = 'IDEA'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CONTROL_TEST
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM control_test .
+
+  DATA : lv_str(10).              "subroutine ### #### local ##.
+
+*-- Compare test
+  IF p_carrid EQ 'AA'.
+
+    MESSAGE 'America airline' TYPE 'S'.
+
+  ELSEIF p_carrid EQ 'LH'.
+
+    MESSAGE 'Luft hanza' TYPE 'S'.
+
+  ELSE.
+
+    MESSAGE 'Others' TYPE 'S'.
+
+  ENDIF.
+
+*-- Compare test2
+  IF ( p_curr EQ 'USD' ) OR
+     ( p_curr EQ 'KRW' ) OR
+     ( p_curr EQ 'VND' ).
+
+  ENDIF.
+
+  IF ( p_curr   EQ 'EUR' ) AND
+     ( p_carrid EQ 'LH' ).
+
+  ENDIF.
+*-- Check empty case 1
+  IF p_carrid IS INITIAL.
+    " Is empty?
+  ENDIF.
+
+*-- Case 2
+  IF  p_carrid EQ space.
+    " Is space?
+  ENDIF.
+
+*-- Check not empty case 1
+  IF p_carrid IS NOT INITIAL.
+    " Is full?
+  ENDIF.
+
+*-- Case 2
+  IF p_carrid NE space.
+    " Is not space?
+  ENDIF.
+
+*-- Check between
+  IF p_carrid BETWEEN 'AA' AND 'LH'.
+  ENDIF.
+
+  IF ( p_carrid GE 'AA' ) AND
+     ( p_carrid LE 'LH' ).
+  ENDIF.
+
+*-- Contains
+  lv_str = 'abcdefghijklissemd'.
+  IF 'lit1' && lv_str CA 'fgh'.
+  ENDIF.
+
+*-- Case statement
+  CASE p_carrid.
+    WHEN 'AZ'.
+      MESSAGE 'AZ' TYPE 'S'.
+    WHEN 'CA'.
+      MESSAGE 'Canada airline' TYPE 'S'.
+    WHEN 'JL' OR 'KR' OR 'AL'.                      "IF ## AND# ### CASE# AND# ###
+
+    WHEN OTHERS.
+      MESSAGE 'When Others' TYPE 'S'.
+  ENDCASE.
+
+*-- Data append
+CLEAR gs_scarr.       "data# #### ##
+  gs_scarr-carrid   = 'AA'.
+  gs_scarr-carrname = 'American airline'.
+  gs_scarr-currcode = 'USD'.
+  gs_scarr-url      = 'http://www.americanair.com'.
+  APPEND gs_scarr TO gt_scarr.
+
+  CLEAR gs_scarr.
+  gs_scarr-carrid   = 'LH'.
+  gs_scarr-carrname = 'Luft Janza'.
+  gs_scarr-currcode = 'EUR'.
+  gs_scarr-url      = 'http://www.luftjanza.com'.
+  APPEND gs_scarr TO gt_scarr.
+
+  CLEAR gs_scarr.
+  gs_scarr-carrid   = 'CA'.
+  gs_scarr-carrname = 'Canada Airline'.
+  gs_scarr-currcode = 'EUR'.
+  gs_scarr-url      = 'http://www.canadaair.com'.
+  APPEND gs_scarr TO gt_scarr.
+
+  LOOP AT gt_scarr INTO gs_scarr.               "internal table# ## work area# ####.
+
+    CASE gs_scarr-carrid.
+      WHEN 'AA'.
+        WRITE :/ 'American airline'.
+      WHEN 'LH'.
+        WRITE :/ 'Luft hanza'.
+      WHEN OTHERS.
+        WRITE :/ sy-tabix, gs_scarr-carrid, gs_scarr-carrname.
+    ENDCASE.
+
+    LOOP AT gt_scarr INTO gs_scarr WHERE carrid   EQ p_carrid
+                                   AND   currcode EQ p_curr.
+    ENDLOOP.
+
+    LOOP AT gt_scarr INTO gs_scarr WHERE carrid BETWEEN p_carrid
+                                                AND     'AZ'
+                                   AND   currcode EQ p_curr.
+    ENDLOOP.
+
+*-- Read by index
+    READ TABLE gt_scarr INTO gs_scarr INDEX 2.
+  ENDLOOP.
+
+*-- Read by condition
+    CLEAR gs_scarr.
+    READ TABLE gt_scarr INTO gs_scarr WITH KEY carrid   = p_carrid
+                                               currcode = 'EUR'.
+    IF sy-subrc EQ 0.
+      gs_scarr-currcode = 'USD'.                      "Read Table ### ### #### ##.
+    ENDIF.
+
+*-- Binary search
+*-- 2#### ## #### ## ### ## ### #### ### ######.
+  SORT gt_scarr BY carrid currcode ASCENDING.
+  CLEAR gs_scarr.
+  READ TABLE gt_scarr INTO gs_scarr WITH KEY carrid   = p_carrid      "### SORT# #### ######'
+                                             currcode ='EUR'
+                                             BINARY SEARCH.
+  IF sy-subrc EQ 0.
+
+    ELSE.
+  ENDIF.
+
+
+*-- Bad sample
+  SORT gt_scarr.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  REPEAT_TEST
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM repeat_test .
+
+  DATA : lv_cnt   TYPE i.
+
+  DO.
+
+*   ADD 1 TO lv_cnt.
+
+*-- Abort condition
+*    IF lv_cnt GE 10.
+*      EXIT.
+*    ENDIF.
+
+    IF sy-index GE 3.
+      EXIT.
+    ENDIF.
+
+  ENDDO.
+
+  DO 10 TIMES.
+
+  ENDDO.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+*FORM get_data .
+*  CLEAR : gt_scarr, gs_scarr.
+*  SELECT carrid connid fldate price planetype
+*    INTO CORRESPONDING FIELDS OF TABLE gt_flight
+*    FROM scarr
+*    WHERE carrid
+*ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+  CLEAR : gt_sflight, gs_sflight.
+  SELECT carrid connid fldate price planetype
+    INTO CORRESPONDING FIELDS OF TABLE gt_sflight
+    FROM sflight
+    WHERE carrid    EQ p_carrid
+    AND   currency  EQ p_curr
+    AND   fldate    IN s_fldate
+    AND   connid    IN s_connid.
+
+    IF sy-subrc NE 0.
+      MESSAGE S037(K5) DISPLAY LIKE 'E'.
+      STOP.
+    ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_data .
+  LOOP AT gt_sflight INTO gs_sflight.
+    WRITE :/ gs_sflight-carrid, gs_sflight-connid, gs_sflight-fldate, gs_sflight-price, gs_sflight-planetype.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MODIFY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM modify_screen .
+
+  LOOP AT SCREEN.
+
+    CASE 'X' .
+      WHEN p_air.
+*-- Edit <--> Read only   <- p_air
+       IF screen-group1  = 'CAR'.
+           screen-input  = 0.
+       ENDIF.
+      WHEN p_fldate.
+*-- Active <--> Inactive  <- p_fldate
+      IF screen-group1  = 'FLD'.
+          screen-input  = 0.
+      ENDIF.
+    ENDCASE.
+
+
+    MODIFY SCREEN.
+
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  BUTTON_ACTION
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM button_action .
+
+  CASE sscrfields-ucomm.
+    WHEN 'ON'.
+      MESSAGE S001(K5) WITH TEXT-i01.
+    WHEN 'ON01'.
+      MESSAGE S001(k5) WITH text-i02.
+  ENDCASE.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

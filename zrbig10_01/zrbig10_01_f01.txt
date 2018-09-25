@@ -1,0 +1,98 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_01_F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_carrid = 'AA'.        " Parameter
+
+  s_connid-sign     = 'I'.    " I : Include, E : Exclude
+  s_connid-option   = 'EQ'.   " EZ, NE, GE, GT...
+  s_connid-low      = '555'.
+  APPEND s_connid.
+  CLEAR s_connid.
+
+  s_connid-sign     = 'E'.
+  s_connid-option   = 'EQ'.
+  s_connid-low      = '789'.
+  APPEND s_connid.
+  CLEAR s_connid.
+
+  s_connid-sign     = 'I'.
+  s_connid-option   = 'BT'.
+  s_connid-low      = '1699'.
+  s_connid-high     = '1984'.
+  APPEND s_connid.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CHECK_VALIDATION
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM check_validation .
+*-- Airline code# ZZ## Error message
+  IF p_carrid EQ 'ZZ'.          " EQ ## = # ##
+
+    MESSAGE 'Error!!!'  TYPE 'S' DISPLAY LIKE 'E'.    "E =##/I=##/S=##/W=## : ### ### SAP## ### ### ##### ### ###, ### ## #### ####.
+    STOP.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_data .
+*      WRITE /: '###',
+*               '###',
+*               '###'.
+*  LOOP AT s_connid.
+*
+*      WRITE /: s_connid-sign, s_connid-option, s_connid-low, s_connid-high.
+*  ENDLOOP.
+
+  LOOP AT gt_scarr INTO gs_scarr.
+    WRITE :/ gs_scarr-carrid, gs_scarr-carrname, gs_scarr-currcode, gs_scarr-url.
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SCARR_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_scarr_data .
+*-- Get airline info
+  CLEAR : gt_scarr, gs_scarr.
+  SELECT carrid carrname currcode url
+    INTO CORRESPONDING FIELDS OF TABLE gt_scarr
+    FROM scarr
+    WHERE carrid    EQ p_carrid
+    AND   currcode  IN s_curr               "selection options# IN
+    AND   url       IN s_url.
+
+    IF sy-subrc NE 0.
+      MESSAGE S037(K5) DISPLAY LIKE 'E'.
+      STOP.
+    ENDIF.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

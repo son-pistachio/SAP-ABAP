@@ -1,0 +1,92 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_24
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_24top                           .    " global Data
+
+INCLUDE zrbig10_24s01                           .  " Selection screen
+INCLUDE zrbig10_24c01                           .  " Local class
+INCLUDE zrbig10_24f01                           .  " FORM-Routines
+
+**********************************************************************
+* INITIALIZATION
+**********************************************************************
+INITIALIZATION.
+  PERFORM set_init_value.
+
+**********************************************************************
+* START-OF-SELECTION
+**********************************************************************
+START-OF-SELECTION.
+
+*-- Using global class
+IF go_flight IS INITIAL.    " if# ### #### ###
+  CREATE OBJECT go_flight.    " ## - Create Object ##.
+ENDIF.
+
+CASE 'X'.
+  WHEN p_scarr.
+    PERFORM get_airline_info_global.     " Get scarr
+  WHEN p_spfli.
+    PERFORM get_flight_connection_global.
+  WHEN p_sflig.
+    PERFORM get_flight_schedule_global.
+  WHEN p_sbook.
+    PERFORM get_booking_data_global.
+ENDCASE.
+
+IF go_flight IS NOT INITIAL.    " ###.
+  FREE go_flight.
+ENDIF.
+
+**********************************************************************
+* Using local class
+**********************************************************************
+*-- Create Object Before Using Method
+*  IF go_airline IS INITIAL.
+*    CREATE OBJECT go_airline.
+*  ENDIF.
+*  CASE 'X'.
+*    WHEN p_scarr.
+*      PERFORM get_airline_data.     " Get scarr
+*    WHEN p_spfli.
+*      PERFORM get_connection_data.  " Get spfli
+*    WHEN p_sflig.
+*      PERFORM get_sflight_data.     " Get sflight
+*    WHEN p_sbook.
+*      PERFORM get_booking_data.     " Get sbook
+*  ENDCASE.
+*
+*  IF go_airline IS NOT INITIAL.
+*    FREE go_airline.
+*  ENDIF.
+
+*Text elements
+*----------------------------------------------------------
+* E01 No data found
+* T01 Condition
+* T02 Choice
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_CARRID D       .
+* P_SBOOK         Booking info
+* P_SCARR         Airline master
+* P_SFLIG         Flight schedule
+* P_SPFLI         Flight connection
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

@@ -1,0 +1,42 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_43
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_43top                           .    " global Data
+
+ INCLUDE ZRBIG10_43s01                           .  " Selection screen
+* INCLUDE ZRBIG10_43I01                           .  " PAI-Modules
+* INCLUDE ZRBIG10_43F01                           .  " FORM-Routines
+
+START-OF-SELECTION.
+
+  CLEAR gt_spfli.
+
+  CASE 'X'.
+    WHEN p_max.
+      SELECT *
+        INTO CORRESPONDING FIELDS OF TABLE gt_spfli
+        FROM spfli
+        WHERE carrid EQ ( SELECT MAX( carrid ) AS carrid
+                     FROM scarr ).
+
+    WHEN p_min.
+      SELECT *
+        INTO CORRESPONDING FIELDS OF TABLE gt_spfli
+        FROM spfli
+        WHERE carrid EQ ( SELECT MIN( carrid ) AS carrid
+                     FROM scarr ).
+  ENDCASE.
+
+  LOOP AT gt_spfli INTO gs_spfli.
+
+    WRITE :/ gs_spfli-carrid, gs_spfli-connid,
+             gs_spfli-cityfrom, gs_spfli-cityto.
+  ENDLOOP.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

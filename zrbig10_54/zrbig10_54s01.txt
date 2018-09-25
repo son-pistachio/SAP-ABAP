@@ -1,0 +1,10 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_54S01
+*&---------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01.
+SELECT-OPTIONS s_laufd  FOR reguh-laufd.
+PARAMETERS  p_zbukr TYPE reguh-zbukr.
+SELECTION-SCREEN END OF BLOCK pa1.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

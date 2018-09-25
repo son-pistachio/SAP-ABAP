@@ -1,0 +1,60 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_06F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid  = 'AZ'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SBOOK_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_sbook_data .
+  CLEAR : gt_sbook, gs_sbook.
+
+  SELECT carrid connid fldate bookid passname wunit
+  FROM  sbook
+  INTO CORRESPONDING FIELDS OF TABLE gt_sbook
+  WHERE carrid    EQ  p_carrid
+  AND   connid    IN  s_connid
+  AND   fldate    IN  s_fldate
+  AND   bookid    IN  s_bookid.
+
+  IF sy-subrc EQ 0.
+    WRITE : sy-dbcnt.
+    MESSAGE i001 WITH TEXT-s01 sy-dbcnt '####.' DISPLAY LIKE 'S'.
+  ELSE.
+*      MESSAGE 'No data found' TYPE 'S' DISPLAY LIKE 'E'.
+*      MESSAGE S037(K5) DISPLAY LIKE 'E'.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SBOOK_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_sbook_data .
+  LOOP AT gt_sbook INTO gs_sbook.
+    WRITE :/ gs_sbook-carrid, gs_sbook-connid, gs_sbook-fldate, gs_sbook-bookid, gs_sbook-passname, gs_sbook-wunit.
+
+  ENDLOOP.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

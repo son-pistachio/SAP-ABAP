@@ -1,0 +1,37 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_44TOP                                     Report ZRBIG10_44
+*&
+*&---------------------------------------------------------------------*
+REPORT zrbig10_44 MESSAGE-ID k5.
+
+DATA : BEGIN OF gs_body,
+         mjahr TYPE mkpf-mjahr,
+         mblnr TYPE mkpf-mblnr,
+         awsys TYPE mkpf-awsys,
+         vgart TYPE mkpf-vgart,
+         xblnr TYPE mkpf-xblnr,
+       END OF gs_body,
+
+       gs_mseg TYPE mseg.
+
+DATA : gt_body LIKE TABLE OF gs_body,
+       gt_mseg LIKE TABLE OF gs_mseg.
+
+DATA : go_container TYPE REF TO cl_gui_docking_container,
+       go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+
+       go_pop_cont  TYPE REF TO cl_gui_custom_container,
+       go_pop_grid  TYPE REF TO cl_gui_alv_grid.
+
+DATA : gs_layout   TYPE lvc_s_layo,
+       gs_fcat     TYPE lvc_s_fcat,
+       gt_fcat     LIKE TABLE OF gs_fcat,
+
+       gs_pop_layo TYPE lvc_s_layo,
+       gs_pop_fcat TYPE lvc_s_fcat,
+       gt_pop_fcat LIKE TABLE OF gs_pop_fcat.
+
+DATA : gv_okcode TYPE sy-ucomm.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

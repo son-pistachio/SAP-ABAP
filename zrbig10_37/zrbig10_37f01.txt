@@ -1,0 +1,104 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_37F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+
+  p_monat = sy-datum+4(2).
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  FIELD-SYMBOLS <lv_fs> TYPE any.
+
+  DATA : lv_sum     TYPE bseg-dmbtr,
+         lv_mon(2)  TYPE n,
+         lv_var(20).             " For dynamic variable
+
+  CLEAR : gs_body, gt_body.
+
+  SELECT SINGLE *
+    INTO CORRESPONDING FIELDS OF gs_body
+    FROM ztbig00_02.
+
+*-- ####
+  CLEAR lv_mon.
+  DO p_monat TIMES.   " ###### ####
+
+    lv_mon = lv_mon + 1.
+
+*-- Make variable
+    CLEAR lv_var.
+    CONCATENATE 'gs_body-mon' lv_mon INTO lv_var.       " #### ### lv_var# ###.
+
+*-- Assign to Field symbols
+    ASSIGN (lv_var) TO <lv_fs>. " <-- ASSIGN gs_data-mon00 TO <lv_fs>.
+    " ##### ### #### ### ### ## #### ## ###.
+
+*-- ASSIGN # ## <lv_fs># gs_body-mon00# ## ## ##.
+
+    lv_sum = lv_sum + <lv_fs>.
+
+  ENDDO.
+
+  WRITE :/ lv_sum.
+*  CASE p_monat.
+*    WHEN '1'.
+*      lv_sum = gs_body-mon01.
+*    WHEN '2'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02.
+*    WHEN '3'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03.
+*    WHEN '4'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04.
+*    WHEN '5'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05.
+*    WHEN '6'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06.
+*    WHEN '7'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06 + gs_body-mon07.
+*    WHEN '8'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06 + gs_body-mon07 + gs_body-mon08.
+*    WHEN '9'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06 + gs_body-mon07 + gs_body-mon08
+*      + gs_body-mon09.
+*    WHEN '10'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06 + gs_body-mon07 + gs_body-mon08
+*      + gs_body-mon09 + gs_body-mon10.
+*    WHEN '11'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06 + gs_body-mon07 + gs_body-mon08
+*      + gs_body-mon09 + gs_body-mon10 + gs_body-mon11.
+*    WHEN '12'.
+*      lv_sum = gs_body-mon01 + gs_body-mon02 + gs_body-mon03 + gs_body-mon04
+*      + gs_body-mon05 + gs_body-mon06 + gs_body-mon07 + gs_body-mon08
+*      + gs_body-mon09 + gs_body-mon10 + gs_body-mon11 + gs_body-mon12.
+*  ENDCASE.
+
+*  WRITE :/ lv_sum.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

@@ -1,0 +1,20 @@
+*&---------------------------------------------------------------------*
+*& Include ZRBIG10_02TOP                                     Report ZRBIG10_02
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRBIG10_02 LINE-SIZE 300.
+
+TABLES : scarr, spfli, sbook, sflight, sscrfields.
+
+
+**********************************************************************
+* Internal table and Work area
+**********************************************************************
+DATA : gt_scarr TYPE TABLE OF scarr,
+       gs_scarr TYPE scarr.
+
+DATA : gt_sflight TYPE TABLE OF sflight,
+       gs_sflight TYPE sflight.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

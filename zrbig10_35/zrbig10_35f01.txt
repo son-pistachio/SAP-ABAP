@@ -1,0 +1,66 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_35F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  EXECUTE_BDC
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM execute_bdc .
+
+  data : lv_fisrt(2), lv_second(2).
+
+  lv_fisrt = p_first.
+  lv_second = p_second.
+
+*-- Make BDC Data
+  CLEAR : gt_bdcdata, gs_bdcdata.
+                         "Dynbegin    Program(Fnam)     Dynpro(Fval)
+  PERFORM dynpro USING : 'X'          'SAPMZBIG10_01'   '0100',
+                         ' '          'BDC_OKCODE'      '/00',
+                         ' '          'GV_CARRID'       p_carrid,
+                         ' '          'GV_A'            lv_fisrt,
+                         ' '          'GV_B'            lv_second,
+                         ' '          'GV_SMOKER'       p_smoker,
+                         'X'          'SAPMZBIG10_01'   '0100',
+                         ' '          'BDC_OKCODE'      '/EBACK'.
+
+*-- Set BDC Options
+  gs_params-dismode  = p_mode." A, N, E, P
+  gs_params-updmode  = 'S'.   " Synchronous, Asynchronous, Local
+  gs_params-nobiend  = space. " Boolean
+  gs_params-racommit = 'X'.   " Boolean
+
+*-- Execute transaction with BDC Data
+  CALL TRANSACTION 'ZMZBIG10_01' USING gt_bdcdata
+                                 OPTIONS FROM gs_params.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DYNPRO
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0010   text
+*      -->P_0011   text
+*      -->P_0012   text
+*----------------------------------------------------------------------*
+FORM dynpro  USING pv_begin pv_fnam pv_fval.
+
+  IF pv_begin EQ 'X'. " Dynpro begin
+    gs_bdcdata-dynbegin = pv_begin.
+    gs_bdcdata-program  = pv_fnam.
+    gs_bdcdata-dynpro   = pv_fval.
+  ELSE.
+    gs_bdcdata-fnam   = pv_fnam.
+    gs_bdcdata-fval   = pv_fval.
+  ENDIF.
+
+  APPEND gs_bdcdata TO gt_bdcdata.
+  CLEAR gs_bdcdata.
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

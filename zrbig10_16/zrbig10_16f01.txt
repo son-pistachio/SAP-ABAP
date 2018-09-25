@@ -1,0 +1,344 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_16F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT_VALUE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init_value .
+  p_carrid    = 'LH'.
+
+  LOOP AT SCREEN.
+    IF screen-group1 EQ 'AA'.
+      screen-input = 0.
+    ELSE.
+      screen-input = 1.
+      screen-active = 1.
+    ENDIF.
+    MODIFY SCREEN.
+
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CHECK-PARAM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM check-param .
+
+  CASE 'X'.
+    WHEN p_air.
+
+      DATA : ls_sflight   TYPE sflight.
+
+      CHECK s_connid IS NOT INITIAL.
+
+      CLEAR ls_sflight.
+      SELECT SINGLE *
+        INTO CORRESPONDING FIELDS OF ls_sflight
+        FROM sflight
+        WHERE carrid  EQ p_carrid
+        AND connid  EQ s_connid-low
+        AND fldate  EQ s_fldate-low.
+
+      IF ls_sflight IS INITIAL.
+        MESSAGE s001(k5) WITH TEXT-e01 DISPLAY LIKE 'E'.
+        STOP.
+
+      ENDIF.
+
+    WHEN p_book.
+
+      DATA : ls_sbook   TYPE sbook.
+
+      CHECK s_connid  IS NOT INITIAL.
+
+      CLEAR ls_sbook.
+      SELECT SINGLE *
+        INTO CORRESPONDING FIELDS OF ls_sbook
+        FROM sbook
+        WHERE carrid  EQ p_carrid
+        AND   connid  EQ s_connid-low.
+
+      IF ls_sbook IS INITIAL.
+        MESSAGE s001(k5) WITH TEXT-e01  DISPLAY LIKE 'E'.
+        STOP.
+
+      ENDIF.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MODIFY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM modify_screen .
+  LOOP AT SCREEN.
+
+    CASE 'X'.
+      WHEN p_air.
+        IF  screen-group1 = 'AA'.
+          screen-input  = 0.
+        ELSEIF screen-group1 = 'BB'.
+          screen-active = 1.
+        ENDIF.
+      WHEN p_book.
+        IF screen-group1 = 'AA'.
+          screen-input  = 1.
+        ELSEIF screen-group1  ='BB'.
+          screen-active = 0.
+        ENDIF.
+    ENDCASE.
+
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  " system field(sy-)# #### ### ### ### ## #### ####. ###
+  DATA : lv_tabix TYPE sy-tabix.
+
+  CASE 'X'.
+    WHEN p_air.
+      CLEAR : gt_sflight, gs_sflight.
+      SELECT *
+        INTO CORRESPONDING FIELDS OF TABLE gt_sflight
+        FROM sflight
+        WHERE connid IN s_connid
+        AND   carrid EQ p_carrid.
+
+
+*-- Set color code-----------------------------------
+      IF gt_sflight IS NOT INITIAL.
+        LOOP AT gt_sflight INTO gs_sflight.
+
+          lv_tabix = sy-tabix.   "###
+
+          CASE gs_sflight-connid.
+            WHEN '0400'.    " numeric character 4##### ## 0# ###.
+              gs_sflight-col  = 'C510'. " Green
+            WHEN '0401'.
+              gs_sflight-col  = 'C710'. " Orange
+          ENDCASE.
+
+          MODIFY gt_sflight FROM gs_sflight INDEX sy-tabix TRANSPORTING col. "###
+
+        ENDLOOP.
+
+      ENDIF.
+
+*------------------------------------------------------------------
+
+    WHEN p_book.
+      CLEAR : gt_sbook, gs_sbook.
+      SELECT *
+        INTO CORRESPONDING FIELDS OF TABLE gt_sbook
+        FROM sbook
+        WHERE connid IN s_connid
+        AND   carrid EQ p_carrid.
+  ENDCASE.
+
+  IF gt_sbook IS NOT INITIAL.
+    LOOP AT gt_sbook INTO gs_sbook.
+
+      lv_tabix = sy-tabix.
+
+      IF gs_sbook-smoker  EQ 'X'.
+        gs_sbook-pic  = icon_activate.
+      ENDIF.
+
+      MODIFY gt_sbook FROM gs_sbook INDEX lv_tabix TRANSPORTING pic.
+
+    ENDLOOP.
+
+  ENDIF.
+
+
+  IF sy-subrc EQ 0.
+*    WRITE : sy-dbcnt.
+    MESSAGE s001(k5) WITH TEXT-s01 sy-dbcnt.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  INIT_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM init_screen .
+  DATA : lv_structure TYPE dd02l-tabname,      " Structure name
+         lv_itab_name(10).                     " Internal table name
+
+  FIELD-SYMBOLS : <lt_itab> TYPE STANDARD TABLE.
+
+  CASE 'X'.
+    WHEN p_air.
+      lv_structure = 'SFLIGHT'.
+      ASSIGN gt_sflight TO <lt_itab>.
+    WHEN p_book.
+      lv_structure = 'SBOOK'.
+      ASSIGN gt_sbook TO <lt_itab>.
+  ENDCASE.
+
+  PERFORM set_layout.
+
+  IF go_container IS INITIAL.
+
+    PERFORM create_object.
+
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name              = lv_structure
+        i_save                        = 'A'
+        i_default                     = 'X'
+        is_layout                     = gs_layout
+      CHANGING
+        it_outtab                     = <lt_itab>
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+*--------------------------------------------------------------------*
+*    CASE 'X'.
+*      WHEN p_air.
+*        CALL METHOD go_alv_grid->set_table_for_first_display
+*          EXPORTING
+*            i_structure_name              = 'SFLIGHT'
+*            i_save                        = 'A'
+*            i_default                     = 'X'
+*            is_layout                     = gs_layout
+*          CHANGING
+*            it_outtab                     = gt_sflight
+*          EXCEPTIONS
+*            invalid_parameter_combination = 1
+*            program_error                 = 2
+*            too_many_lines                = 3
+*            OTHERS                        = 4.
+*
+*      WHEN p_book.
+*        CLEAR : gt_fcat, gs_fcat.
+*
+*        PERFORM set_field_catalog
+*        USING :
+*                  'X' 'PIC'         'Icon'        ' ',
+*                  'X' 'CARRID'      'Airline'     ' ',
+*                  'X' 'CONNID'      'Connection'  ' ',
+*                  'X' 'FLDATE'      'Flight date' ' ',
+*                  'X' 'BOOKID'      'Booking'     ' ',
+*                  ' ' 'SMOKER'      'Smoker'      'X',
+*                  ' ' 'LUGGWEIGHT'  'Weight'      ' ',
+*                  ' ' 'WUNIT'       'Unit'        ' ',
+*                  ' ' 'PASSNAME'    'Pass name'   'X',
+*                  ' ' 'ORDER_DATE'  'Order date'  ' '.
+
+*        CALL METHOD go_alv_grid->set_table_for_first_display
+*          EXPORTING
+*            i_structure_name              = 'SBOOK'
+*            i_save                        = 'A'
+*            i_default                     = 'X'
+*            is_layout                     = gs_layout
+*          CHANGING
+*            it_outtab                     = gt_sbook
+*            it_fieldcatalog               = gt_fcat
+*          EXCEPTIONS
+*            invalid_parameter_combination = 1
+*            program_error                 = 2
+*            too_many_lines                = 3
+*            OTHERS                        = 4.
+*    ENDCASE.
+  ELSE.
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+  gs_layout-zebra       = 'X'.
+  gs_layout-cwidth_opt  = 'X'.
+  gs_layout-sel_mode    = 'D'.
+  gs_layout-info_fname  = 'COL'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+*  CREATE OBJECT go_container
+*    EXPORTING
+*      container_name = 'GO_CONT'.
+  CREATE OBJECT go_container
+    EXPORTING
+      repid     = sy-repid
+      dynnr     = sy-dynnr
+      side      = go_container->dock_at_left
+      extension = 3000.
+
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+      i_parent = go_container.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_0319   text
+*      -->P_0320   text
+*      -->P_0321   text
+*----------------------------------------------------------------------*
+FORM set_field_catalog USING pv_key pv_field pv_text pv_emphasize.
+  gs_fcat-key       = pv_key.
+  gs_fcat-fieldname = pv_field.
+  gs_fcat-coltext   = pv_text.
+  gs_fcat-emphasize = pv_emphasize.
+
+*-- SCREEN### #####.
+  CASE pv_field.
+    WHEN 'SMOKER' OR 'BOOKID' OR 'ORDER_DATE'.
+      gs_fcat-ref_table   = 'SBOOK'.
+  ENDCASE.
+
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR gs_fcat.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

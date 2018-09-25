@@ -1,0 +1,51 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_26
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_26top                           .    " global Data
+
+INCLUDE zrbig10_26s01                           .  " Selection Screen
+INCLUDE zrbig10_26c01                           .  " AVL Event
+INCLUDE zrbig10_26o01                           .  " PBO-Modules
+INCLUDE zrbig10_26i01                           .  " PAI-Modules
+INCLUDE zrbig10_26f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037(k5) DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> G/L Open item list
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_MJAHR         Document year
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*037   No data found
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

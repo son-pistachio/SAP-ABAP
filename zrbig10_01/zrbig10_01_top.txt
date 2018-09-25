@@ -1,0 +1,108 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZRBIG10_01_TOP
+*&---------------------------------------------------------------------*
+
+TABLES : scarr, spfli.
+
+**********************************************************************
+* Workarea
+**********************************************************************
+*-- Global type by Transparent table
+DATA : gs_scarr   TYPE scarr,
+       gs_spfli   TYPE spfli,
+       gs_sflight TYPE sflight,
+       gs_sbook   TYPE sbook.
+
+*-- Global type by Structure
+DATA : gs_member  TYPE zsbig18_01.
+
+*-- Local type : TYPES
+TYPES : BEGIN OF ts_flight,
+          carrid   TYPE scarr-carrid,
+          url      TYPE scarr-url,
+          connid   TYPE spfli-connid,
+          cityfrom TYPE spfli-cityfrom,
+          fldate   TYPE sflight-fldate,
+        END OF ts_flight.
+
+DATA : gs_flight    TYPE ts_flight.
+
+*-- Local type : DATA
+DATA : BEGIN OF gs_flight2,
+         carrid TYPE scarr-carrid,
+         connid TYPE spfli-connid,
+         fldate TYPE sflight-fldate,
+         bookid TYPE sbook-bookid,
+       END OF gs_flight2.
+
+DATA : gs_flight3 LIKE gs_flight2.
+
+*-- Include structure
+DATA : BEGIN OF gs_bookinfo.
+       INCLUDE STRUCTURE sbook.
+DATA : icon   TYPE icon-id,
+       bukrs  TYPE t001-bukrs,
+       END OF gs_bookinfo.
+
+*-- data select
+
+
+**********************************************************************
+* Internal table
+**********************************************************************
+*-- Global type by transparent table w/o headerline
+DATA : gt_scarr   TYPE TABLE OF scarr,
+       gt_spfli   TYPE TABLE OF spfli,
+       gt_sflight TYPE TABLE OF sflight,
+       gt_sbook   TYPE TABLE OF sbook.
+
+*-- Global type by transparent table w/ headerline
+DATA : gt_scarr2   TYPE TABLE OF scarr WITH HEADER LINE,
+       gt_spfli2   TYPE TABLE OF spfli WITH HEADER LINE,
+       gt_sflight2 TYPE TABLE OF sflight WITH HEADER LINE,
+       gt_sbook2   TYPE TABLE OF sbook WITH HEADER LINE.
+
+*-- Global type by structure
+DATA : gt_member  TYPE TABLE OF zsbig18_01.
+
+*-- Local type w/o headerline
+DATA : gt_flight LIKE TABLE OF gs_flight2,
+       gt_member2 TYPE z_t_big18_01.  "Internal table by table type
+
+*-- Local type w/ headerline
+DATA : BEGIN OF gt_book OCCURS 0,
+        carrid  TYPE scarr-carrid,
+        smoker  TYPE sbook-smoker,
+       END OF gt_book.
+
+***********************************************************************
+* Common variable
+*--------------------------------------------------------------------*
+DATA : gv_data1     TYPE c LENGTH 10,
+       gv_data2(10) TYPE c,
+       gv_data3(10),
+       gv_data4.
+*--------------------------------------------------------------------*
+DATA : gv_date     TYPE d,  " Variable for date, default 8 size
+       gv_time     TYPE t,  " Default 6 size
+       gv_int      TYPE i,  " Default 10 size
+       gv_dec1(5)  TYPE p DECIMALS 2,
+       gv_numc(10) TYPE n,
+       gv_str      TYPE string.
+*--------------------------------------------------------------------*
+DATA : gv_carrid1 TYPE scarr-carrid VALUE 'LH', " Default is 'LH'
+       gv_connid1 TYPE spfli-connid,
+       gv_carrid2 TYPE s_carr_id,
+       gv_connid2 TYPE s_conn_id.
+
+**********************************************************************
+* Class instance
+**********************************************************************
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+       go_container TYPE REF TO cl_gui_custom_container,
+       go_docking   TYPE REF TO cl_gui_docking_container.
+
+RANGES : gr_connid  FOR spfli-connid.
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750

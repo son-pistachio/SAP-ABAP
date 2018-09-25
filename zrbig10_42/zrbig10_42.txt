@@ -1,0 +1,58 @@
+*&---------------------------------------------------------------------*
+*& Report  ZRBIG10_42
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zrbig10_42top                           .    " global Data
+
+INCLUDE zrbig10_42s01                           .  " Selection screen
+INCLUDE zrbig10_42c01                           .  " ALV Event
+INCLUDE zrbig10_42o01                           .  " PBO-Modules
+INCLUDE zrbig10_42i01                           .  " PAI-Modules
+INCLUDE zrbig10_42f01                           .  " FORM-Routines
+
+INITIALIZATION.
+  PERFORM set_init_value.
+
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM display_data.
+
+  IF gt_body IS NOT INITIAL.
+    CALL SCREEN 100.
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* TITLE100 --> Tax Document Segment
+* TITLE110 --> POPUP SCREEN110
+
+*Text elements
+*----------------------------------------------------------
+* T01 Condition
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BUKRS         Company
+* P_GJAHR D       .
+* S_BLART D       .
+* S_BUDAT D       .
+* S_MONAT         Fiscal period
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: K5
+*001   & & & &
+*037   No data found
+*102   Data has been saved
+
+----------------------------------------------------------------------------------
+Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
